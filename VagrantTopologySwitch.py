@@ -127,21 +127,31 @@ def writeRouter(f,Router,Network):
     f.write("config.vm.define \"" + Name+ "\" do |" + Name + "|\n")
     f.write(Name + ".vm.box = \"" + Os + "\"\n")
     f.write(Name + ".vm.hostname = \"" + Name + "\"\n")
-    f.write(Name + ".vm.network \"private_network\", ip: \"" + IpEth1 + "\", netmask: \"255.255.255.240\", virtualbox__intnet: \"broadcast_router-south-"+tmp+"\", auto_config: true\n")
-    f.write(Name + ".vm.network \"private_network\", ip: \"" + IpEth2 + "\",netmask: \"255.255.255.252\", virtualbox__intnet: \"broadcast_router-inter\", auto_config: true\n")
+    
+    if Router[0] is 4:
+      f.write(Name + ".vm.network \"private_network\", ip: \"" + IpEth1 + "\", netmask: \"255.255.255.240\", virtualbox__intnet: \"broadcast_router-south-"+tmp+"\", auto_config: true\n")
+      f.write(Name + ".vm.network \"private_network\", ip: \"" + IpEth2 + "\",netmask: \"255.255.255.252\", virtualbox__intnet: \"broadcast_router-inter\", auto_config: true\n")
+    
+    if Router[0] is 5:
+      f.write(Name + ".vm.network \"private_network\", ip: \"" + IpEth1 + "\", netmask: \"255.255.255.0\", virtualbox__intnet: \"broadcast_router-south-"+tmp+"\", auto_config: true\n")
+      f.write(Name + ".vm.network \"private_network\", ip: \"" + IpEth2 + "\",netmask: \"255.255.255.252\", virtualbox__intnet: \"broadcast_router-inter\", auto_config: true\n")
+    
+
     f.write(Name + ".vm.provision \"shell\", run: \"always\", inline: <<-SHELL\n")
     f.write("echo \"Static Routig configuration Started\"\n")
     f.write("sudo sysctl -w net.ipv4.ip_forward=1\n")
 
     if Router[0] is 4: 
       f.write("sudo route add -net "+IpRouter2Eth1Trn+".0 netmask 255.255.255.0 gw "+Network[4][1]["IpEth2"]+" dev eth2\n")
+      f.write("sudo route add -net "+IpSwitchEth1Trn+".0 netmask 255.255.252.0 gw "+Gw+" dev eth1\n")
+      f.write("sudo route add -net "+IpSwitchEth2Trn+".0 netmask 255.255.252.0 gw "+Gw+" dev eth1\n")
 
     if Router[0] is 5: 
       f.write("sudo route add -net "+IpSwitchEth3Trn+".0 netmask 255.255.255.240 gw "+Network[3][1]["IpEth2"]+" dev eth2\n")
+      f.write("sudo route add -net "+IpSwitchEth1Trn+".0 netmask 255.255.252.0 gw "+Network[3][1]["IpEth2"]+" dev eth2\n")
+      f.write("sudo route add -net "+IpSwitchEth2Trn+".0 netmask 255.255.252.0 gw "+Network[3][1]["IpEth2"]+" dev eth2\n")
 
-
-    f.write("sudo route add -net "+IpSwitchEth1Trn+".0 netmask 255.255.252.0 gw "+Gw+" dev eth1\n")
-    f.write("sudo route add -net "+IpSwitchEth2Trn+".0 netmask 255.255.252.0 gw "+Gw+" dev eth1\n")
+    
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write("SHELL\n")
@@ -191,9 +201,9 @@ def writeSwitch(f,Switch,Network):
     f.write("SHELL\n")
     f.write(Name + ".vm.provision \"shell\", run: \"always\", inline: <<-SHELL\n")
     f.write("echo \"OpenVSwitch Ip addressing is started\"\n")
-    f.write("sudo ifconfig SW1 "+IpEth1+"/28\n")
-    f.write("sudo ifconfig HA "+IpEth2+"/22\n")
-    f.write("sudo ifconfig HB "+IpEth3+"/22\n")
+    f.write("sudo ifconfig SW1 "+IpEth3+"/28\n")
+    f.write("sudo ifconfig HA "+IpEth1+"/22\n")
+    f.write("sudo ifconfig HB "+IpEth2+"/22\n")
     f.write("sudo ifconfig SW1 up\n")
     f.write("sudo ifconfig HA up\n")
     f.write("sudo ifconfig HB up\n")
