@@ -18,3 +18,7 @@ Automating the deployment of network setups using vagrant
 - "Templates.py" contains an example on how the network is defined by the interface. This network is then converted in
 an html file (The same example can be found "OSPF_Routing_Template.html" in the directory NetworkGraphs/Template)
 N.B. The GUI retrieves data from the HTML file, so it is really crucial to interface the vagrant file generator script with the html file syntax.
+
+# Modification By Luca
+- I created two files "VagrantTopologyOSPF.py" and "VagrantTopologySwitch.py" to generate vagrant files of two default networks
+- Using the comand "vagrant up" with the files generated, i will build the network with the parameters that are parametrized
