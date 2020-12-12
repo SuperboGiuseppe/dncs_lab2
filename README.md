@@ -22,3 +22,4 @@ N.B. The GUI retrieves data from the HTML file, so it is really crucial to inter
 # Modification By Luca
 - I created two files "VagrantTopologyOSPF.py" and "VagrantTopologySwitch.py" to generate vagrant files of two default networks
 - Using the comand "vagrant up" with the files generated, i will build the network with the parameters that are parametrized
+- updated both scripts
