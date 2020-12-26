@@ -11,6 +11,11 @@ Automating the deployment of network setups using vagrant
 # Modification By Uzair
 - Two files are added namely "Vagrant" and "VagrantScriptCreatorInTextFormat".
 - Two more files added namely "OSPFRoutingVag" and "OSPF Routing". One file contains a Python script to create the Vagrant file, the other file is just a JPG topology of the network.
+- Web server and database setup with Vagrant multi-machine using Docker
+-	Traditional web server and database setup
+-	web server (nginx and PHP) on one machine and our database server (MySQL) on another
+-	Our Vagrant file only step up the environment. The other configuration user can make according to their desire of the user.
+
 
 # Modification By Giuseppe
 - Files related to the UI ("gui.py", "html_fix.py") have been added. The first one contains the GUI definition, meanwhile "html_fix.py" fixes the network output of pyvis module.
