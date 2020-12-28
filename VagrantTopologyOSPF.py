@@ -1,9 +1,11 @@
 import ipcalc 
+import codecs
+import yaml
 
 #this function writes the beginning of the VagrantFile
 def BeginVagrantFile(f):
 
-    print("writing the beginning of the vagrant file")
+   # print("writing the beginning of the vagrant file")
     
     f.write("# -*- mode: ruby -*- \n# vi: set ft=ruby :\n\n")
     f.write("#All Vagrant configuration is done below. The 2 in Vagrant.configure\n#configures the configuration version we support older styles for\n#backwards compatibility. Please don't change it unless you know what\n#you're doing.\n")
@@ -23,7 +25,7 @@ def BeginVagrantFile(f):
 #this function write in the vagrant file a new PC host
 def writeHost(f,Host):
 
-    print("adding an host to the vagrant file")
+  #  print("adding an host to the vagrant file")
 
     #extrapolate each attribute from the touples
     Id = Host[1]["Id"]
@@ -47,11 +49,11 @@ def writeHost(f,Host):
     f.write(Name + ".vm.box = \"" + Os + "\"\n")
     f.write(Name + ".vm.hostname = \"" + Name + "\"\n")
 
-    if Id is 1:
+    if Id is 4:
         f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub +"\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_router-south-1\", auto_config: true\n")
-    if Id is 2:
+    if Id is 5:
         f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub +"\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_router-south-2\", auto_config: true\n")
-    if Id is 3:
+    if Id is 6:
         f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub +"\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_router-south-3\", auto_config: true\n")
     
     
@@ -73,7 +75,7 @@ def writeHost(f,Host):
 #this function write in the vagrant file a new Router
 def writeRouter(f,Router):
 
-    print("adding a router to the vagrant file") 
+   # print("adding a router to the vagrant file") 
 
     #extrapolate each attribute from the touples
     Id = Router[1]["Id"]
@@ -120,15 +122,15 @@ def writeRouter(f,Router):
     f.write(Name + ".vm.box = \"" + Os + "\"\n")
     f.write(Name + ".vm.hostname = \""+ Name +"\"\n")
 
-    if Id is 4:
+    if Id is 1:
         f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_router-south-1\", auto_config: false\n")
         f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_router-inter-1\", auto_config: false\n")
         f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_router-inter-3\", auto_config: false\n")
-    if Id is 5:
+    if Id is 2:
         f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_router-south-2\", auto_config: false\n")
         f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_router-inter-2\", auto_config: false\n")
         f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_router-inter-1\", auto_config: false\n")
-    if Id is 6:
+    if Id is 3:
         f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_router-south-3\", auto_config: false\n")
         f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_router-inter-3\", auto_config: false\n")
         f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_router-inter-2\", auto_config: false\n")  
@@ -181,8 +183,8 @@ def writeRouter(f,Router):
 
 #the following is a fake graph that i used for testing
 #instead of typing everytime the input in the command line
-host1 = (1,{
-  "Id" : 1,
+host1 = (4,{
+  "Id" : 4,
   "Name":"host1",
   "Type": "Host",
   "Ram": "1024",
@@ -193,8 +195,8 @@ host1 = (1,{
     "Interface" : "eth1"
   }]
 })
-host2 = (2,{
-  "Id" : 2,
+host2 = (5,{
+  "Id" : 5,
   "Name":"host2",
   "Type": "Host",
   "Ram": "1024",
@@ -205,8 +207,8 @@ host2 = (2,{
     "Interface" : "eth1"
   }]
 })
-host3 = (3,{
-  "Id" : 3,
+host3 = (6,{
+  "Id" : 6,
   "Name":"host3",
   "Type": "Host",
   "Ram": "1024",
@@ -218,8 +220,8 @@ host3 = (3,{
   }]
 })
 
-rout1 = (4,{
-  "Id" : 4,
+rout1 = (1,{
+  "Id" : 1,
   "Name":"router1",
   "Type": "Router",
   "Ram": "1024",
@@ -238,8 +240,8 @@ rout1 = (4,{
     "Interface" : "eth3"
   }]
 })
-rout2 = (5,{
-  "Id" : 5,
+rout2 = (2,{
+  "Id" : 2,
   "Name":"router2",
   "Type": "Router",
   "Ram": "1024",
@@ -258,8 +260,8 @@ rout2 = (5,{
     "Interface" : "eth3"
   }]
 })
-rout3 = (6,{
-  "Id" : 6,
+rout3 = (3,{
+  "Id" : 3,
   "Name":"ruoter3",
   "Type": "Router",
   "Ram": "1024",
@@ -279,14 +281,75 @@ rout3 = (6,{
   }]
 })
 
-fakeNet = [host1,host2,host3,rout1,rout2,rout3]
+MyNet = [host1,host2,host3,rout1,rout2,rout3]
+
+def find_between( s, first, last ):
+    try:
+        start = s.index( first ) + len( first )
+        end = s.index( last, start )
+        return s[start:end]
+    except ValueError:
+        return ""
+
+def remap(newList):
+    print("-------------------")
+
+    for item in newList:
+      print("Looking at device " + str(item))
+      print("the TYPE is " + item["type"])
+      if item["type"] == "router" : 
+
+        for device in MyNet:
+          if device[1]["Id"] is item["id"]:
+            print("remap of device " + str(device[1]["Id"]) + " to device " + str(item["id"]))
+            device[1]["Name"] = item["label"]
+            device[1]["Ram"] = item["ram"]
+            device[1]["Os"] = item["vm_image"]
+
+            device[1]["Network"][0]["Ip"] = item["network_interfaces"][0]["ip_address"]
+            device[1]["Network"][0]["Netmask"] = item["network_interfaces"][0]["netmask"]
+            device[1]["Network"][0]["Interface"] = item["network_interfaces"][0]["name_interface"]
+
+            device[1]["Network"][1]["Ip"] = item["network_interfaces"][1]["ip_address"]
+            device[1]["Network"][1]["Netmask"] = item["network_interfaces"][1]["netmask"]
+            device[1]["Network"][1]["Interface"] = item["network_interfaces"][1]["name_interface"]
+
+            device[1]["Network"][2]["Ip"] = item["network_interfaces"][2]["ip_address"]
+            device[1]["Network"][2]["Netmask"] = item["network_interfaces"][2]["netmask"]
+            device[1]["Network"][2]["Interface"] = item["network_interfaces"][2]["name_interface"]        
+
+    for item in newList:
+      if item["type"] == "host" : 
+
+        for device in MyNet:
+           if device[1]["Id"] is item["id"]:
+             print("remap of device " + str(device[1]["Id"]) + " to device " + str(item["id"]))
+             device[1]["Name"] = item["label"]
+             device[1]["Ram"] = item["ram"]
+             device[1]["Os"] = item["vm_image"]
+
+             device[1]["Network"][0]["Ip"] = item["network_interfaces"][0]["ip_address"]
+             device[1]["Network"][0]["Netmask"] = item["network_interfaces"][0]["netmask"]
+             device[1]["Network"][0]["Interface"] = item["network_interfaces"][0]["name_interface"]
+
+    return MyNet
 
 def main():
     VagrantFile = open("VagrantfileOSPF", "w")
 
     #read the data structure from input
     #Network = G.nodes.data():
-    Network = fakeNet
+    file = codecs.open("NetworkGraphs/Template/OSPF_Routing_Template.html", "r", "utf-8")
+    html = file.read()
+
+    if "nodes = new vis.DataSet(" in html:
+      listOfDevice = find_between(html, "nodes = new vis.DataSet(" , ")")
+      print(listOfDevice)
+      listOfDevice = yaml.load(listOfDevice) 
+
+    newNet = remap(listOfDevice)
+
+    Network = newNet
 
     #first, let's write the beginnig of the VagrantFile
     BeginVagrantFile(VagrantFile)
@@ -298,7 +361,7 @@ def main():
 
     for device in Network: 
         typeOfDevice = device[1]["Type"]
-        print("the device is a " + typeOfDevice)
+        #print("the device is a " + typeOfDevice)
 
         if typeOfDevice is "Router":
             writeRouter(VagrantFile,device)
@@ -306,7 +369,7 @@ def main():
 
     for device in Network:
         typeOfDevice = device[1]["Type"]
-        print("the device is a " + typeOfDevice)
+        #print("the device is a " + typeOfDevice)
 
         if typeOfDevice is "Host":
             writeHost(VagrantFile,device)
