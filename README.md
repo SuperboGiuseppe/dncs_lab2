@@ -18,10 +18,9 @@ Automating the deployment of network setups using vagrant
 
 
 # Modification By Giuseppe
-- Files related to the UI ("gui.py", "html_fix.py") have been added. The first one contains the GUI definition, meanwhile "html_fix.py" fixes the network output of pyvis module.
+- Files related to the UI ("gui.py" ) has been added.
 - Files related to the network entity (A graph in this case) is managed by network_core.py which is under development.
-- "Templates.py" contains an example on how the network is defined by the interface. This network is then converted in
-an html file (The same example can be found "OSPF_Routing_Template.html" in the directory NetworkGraphs/Template)
+- Documentation of the previously introduced scripts.
 N.B. The GUI retrieves data from the HTML file, so it is really crucial to interface the vagrant file generator script with the html file syntax.
 
 # Modification By Luca

@@ -1,8 +1,19 @@
+""" _____________________________________________________________
+
+    Description: User interface code of the network designer
+    Author: Giuseppe Superbo (giuseppe.superbo@studenti.unitn.it)
+    Date: Winter 2020-2021
+    Course: Design of Networks and Communication Systems
+    _____________________________________________________________
+"""
+
+
+
 import sys, os
 from PyQt5 import QtGui, QtWidgets, QtCore, uic, QtWebEngineWidgets
 from pyvis.network import Network
 import matplotlib.image as mpimg
-import numpy, html_fix
+import numpy
 import network_core
 
 
@@ -17,6 +28,12 @@ class network_design_window(QtWidgets.QMainWindow):
 
               Parameters:
                 - self: current instance of the class.
+            
+              Attributes:
+                - current_network: network currently active for any edit;
+                - current_network_name: name of the current network
+                - network_wizard: network wizard window object (Inheritance model)
+                - editor_window: editor window object (Inheritance model)
 
         """
         super(network_design_window, self).__init__()
@@ -91,6 +108,7 @@ class network_design_window(QtWidgets.QMainWindow):
         button_save = QtWidgets.QAction(QtGui.QIcon("./Images/save.png"), "Label", self)
         button_save.setStatusTip("Save the current network")
         button_save.setIconText("Save Network")
+        button_save.triggered.connect(lambda: self.save_file_window())
 
         button_open = QtWidgets.QAction(QtGui.QIcon("./Images/openfile.png"), "Label", self)
         button_open.setStatusTip("Open an existent network")
@@ -154,9 +172,13 @@ class network_design_window(QtWidgets.QMainWindow):
                 - self: current instance of the class.
         """
         file_path = QtWidgets.QFileDialog.getOpenFileName(self, 'OpenFile')
-        self.update_canvas_html(file_path[0])
         self.current_network = network_core.open_network(file_path[0])
+        self.update_canvas_html(os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html"))
         self.editor_window = editor_components(self)
+    
+    def save_file_window(self):
+        file_path = QtWidgets.QFileDialog.getSaveFileName(self, 'SaveFile')
+        self.current_network.save_graph(file_path[0])
     
         
 
@@ -173,6 +195,15 @@ class new_network_wizard(QtWidgets.QWizard):
               Parameters:
                 - self: current instance of the class;
                 - main_window: reference of the main window calling instance.
+              
+              Attributes:
+                - main_window_object: reference of the object that has istantiated an object from this class;
+                - templates_directory_path: absolute path of the template directory used in the wizard selection;
+                - page_start, group_buttons: starting page object of the wizard and its buttons choice;
+                - scratch_page: scratch page object where it is possible to insert the details for creating a network from scratch;
+                - scratch_id: scratch page id;
+                - template_page: template page object where it is possible to insert the details for creating a network from a template;
+                - template_id: template page id;
 
         """
         super(new_network_wizard, self).__init__()
@@ -304,9 +335,7 @@ class new_network_wizard(QtWidgets.QWizard):
 
         """
         if self.currentId() == self.template_id:
-            self.main_window_object.update_canvas_html(self.templates_directory_path + "/" + self.template_page.field("network_path"))
             self.main_window_object.current_network = network_core.open_network(self.templates_directory_path + "/" + self.template_page.field("network_path"))
-            self.main_window_object.editor_window = editor_components(self.main_window_object)
             self.main_window_object.current_network_name = self.template_page.field("network_path")
         else:
             print(self.scratch_page.field("network_name_scratch"))
@@ -325,17 +354,36 @@ class editor_components(QtWidgets.QMainWindow):
                 - self: current instance of the class;
                 - main_window: reference of the main window calling instance.
 
+              Attributes:
+                - main_window_object: reference of the object that has istantiated an object from this class;
+                - tabs: tab collection object;
+                - routers: list of routers from the current network;
+                - swithces: list of switches from the current network;
+                - hosts: list of hosts from the current network;
+                - router_tab: tab form object where it is possible to edit routers configuration;
+                - switch_tab: tab form object where it is possible to edit switches configuration;
+                - host_tab: tab form object where it is possible to edit hosts configuration;
+                - button_frame: frame object where all the buttons of the editor window are located;
+                - button_layout: layout object for the buttons;
+                - button_save: button object for saving the configuration;
+                - button_cancel: button object for deleting the changes;
+                - window: generic widget object that contains all the other widgets.
+
         """        
         super(editor_components, self).__init__()
         self.main_window_object = main_window
         self.temporary_network = self.main_window_object.current_network
+        print(self.temporary_network.nodes)
         self.resize(1024, 768)
         self.setWindowTitle("Editor virtual devices configuration")
         self.setWindowIcon(QtGui.QIcon("./Images/network.png"))
         self.tabs = QtWidgets.QTabWidget()
-        self.router_tab = self.editor_form("Router")
-        self.switch_tab = self.editor_form("Switch")
-        self.host_tab = self.editor_form("Host")
+        self.routers = network_core.nodes_search_type(self.temporary_network, "router")
+        self.switches = network_core.nodes_search_type(self.temporary_network, "switch")
+        self.hosts = network_core.nodes_search_type(self.temporary_network, "host")
+        self.router_tab = self.editor_form("Router", self.routers)
+        self.switch_tab = self.editor_form("Switch", self.switches)
+        self.host_tab = self.editor_form("Host", self.hosts)
         self.tabs.resize(1000,700)
         self.tabs.addTab(self.router_tab, "Routers")
         self.tabs.addTab(self.switch_tab, "Switches")
@@ -346,6 +394,7 @@ class editor_components(QtWidgets.QMainWindow):
         self.button_layout = QtWidgets.QHBoxLayout()
         self.button_layout.setAlignment(QtCore.Qt.AlignRight)
         self.button_save = QtWidgets.QPushButton("Save")
+        self.button_save.clicked.connect(self.on_save)
         self.button_cancel = QtWidgets.QPushButton("Cancel")
         self.button_layout.addWidget(self.button_save)
         self.button_layout.addWidget(self.button_cancel)
@@ -355,7 +404,7 @@ class editor_components(QtWidgets.QMainWindow):
         self.window.setLayout(self.layout)
         self.setCentralWidget(self.window)
     
-    def editor_form(self, type):
+    def editor_form(self, type, devices):
         """Method that initializes a form which contains all the widgets from which it is possible to change the device configuration.
 
               Parameters:
@@ -367,7 +416,6 @@ class editor_components(QtWidgets.QMainWindow):
 
         """
         tab = QtWidgets.QWidget()
-        devices = network_core.nodes_search_type(self.temporary_network, type.lower())
         edit_lines = {}
         if len(devices) > 0:
             window_layout = QtWidgets.QVBoxLayout(tab)
@@ -516,6 +564,28 @@ class editor_components(QtWidgets.QMainWindow):
                 devices[index]["network_interfaces"][table.currentItem().row()]["netmask"] = table.currentItem().text()
             if (table.currentItem().column()==2):
                 devices[index]["network_interfaces"][table.currentItem().row()]["name_interface"] = table.currentItem().text()
+    
+    def on_save(self):
+        """Method called when the user presses the save button in the editor configuration. It applies the changes in the temporary network and updates the network graph of the canvas.
+
+              Parameters:
+                - self: current instance of the class;
+
+        """        
+        G = Network()
+        print(self.routers)
+        print(self.switches)
+        print(self.hosts)
+        network_core.dictionary_to_nodes(self.routers, G)
+        network_core.dictionary_to_nodes(self.switches, G)
+        network_core.dictionary_to_nodes(self.hosts, G)
+        network_core.dictionary_to_edges(self.temporary_network.edges, G)
+        self.main_window_object.current_network = G
+        G.save_graph("./NetworkGraphs/Temp_Network/temp_network.html")
+        network_core.html_fix(os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html"))
+        self.main_window_object.update_canvas_html(os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html"))
+        self.close()
+
 
 def main_application():
     application = QtWidgets.QApplication(sys.argv)
