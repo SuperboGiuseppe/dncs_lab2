@@ -14,7 +14,7 @@ Automating the deployment of network setups using vagrant
 - Web server and database setup with Vagrant multi-machine using Docker
 -	Traditional web server and database setup
 -	web server (nginx and PHP) on one machine and our database server (MySQL) on another
--	Our Vagrant file only step up the environment. The other configuration user can make according to their desire of the user.
+-	Our Vagrant file only step up the environment. The other configuration user can make according to desire of the user.
 
 
 # Modification By Giuseppe
