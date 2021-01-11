@@ -11,7 +11,7 @@
      config.vm.box = "ubuntu/xenial64"
      config.vm.network "forwarded_port", guest: 80, host: 8081
      config.vm.provision "docker" do |doc|
-	     dock.pull_images "nginx"
+	     doc.pull_images "nginx"
          doc.pull_images "mysql"
 		 doc.run "mysql"
 		 doc.run "nginx", args: "-p 80:80"
