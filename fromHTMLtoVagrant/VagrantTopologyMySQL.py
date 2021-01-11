@@ -15,7 +15,7 @@ def BeginVagrantFile(f):
     f.write("# backwards compatibility). Please don't change it unless you know what\n")
     f.write("# you're doing.\n")
     f.write("Vagrant.configure(\"2\") do |config|\n")
-    f.write("config.vm.box_check_update = true")
+    f.write("config.vm.box_check_update = true\n")
     f.write('config.vm.provider "virtualbox" do |vb|\n')
     f.write('vb.customize ["modifyvm", :id, "--usb", "on"]\n')
     f.write('vb.customize ["modifyvm", :id, "--usbehci", "off"]\n')
@@ -199,7 +199,7 @@ def writeRouter(f,Router):
     f.write(Name + '.vm.network "private_network", ip: \"' + IpNoSub1 + '\", netmask: \"' + Netmask1 + '\", virtualbox__intnet: "broadcast_router-south-1", auto_config: true\n')
     f.write(Name + '.vm.network "private_network", ip: \"' + IpNoSub2 + '\", netmask: \"' + Netmask2 + '\", virtualbox__intnet: "broadcast_router-south-2", auto_config: true\n')
     f.write(Name + '.vm.network "private_network", ip: \"' + IpNoSub3 + '\", netmask: \"' + Netmask3 + '\", virtualbox__intnet: "broadcast_router-south-3", auto_config: true\n')
-    f.write(Name + ".vm.provision \"shell\", inline: <<-SHELL\n")
+    f.write(Name + ".vm.provision \"shell\", run: \"always\", inline: <<-SHELL\n")
     f.write("echo \" Quagga "+ Name +" start installing\"\n")
     f.write("#sudo sysctl -w net.ipv4.ip_forward=1\n")
     f.write("sudo apt-get update\n")
@@ -234,7 +234,6 @@ def writeRouter(f,Router):
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write("SHELL\n")
-    f.write("# " + Name + ".vm.provision \"shell\", path: \"common.sh\"\n")
     f.write(Name + ".vm.provider \"virtualbox\" do |vb|\n")
     f.write("vb.memory = " + Ram + "\n")
     f.write("end\n")
@@ -402,7 +401,7 @@ def main():
         if typeOfDevice is "Db":
             writeDatabase(VagrantFile,device)
 
-    VagrantFile.write("end\n")
+    #VagrantFile.write("end\n")
     VagrantFile.close()
 
 main()

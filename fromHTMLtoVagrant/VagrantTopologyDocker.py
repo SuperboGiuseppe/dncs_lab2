@@ -16,7 +16,7 @@ def BeginVagrantFile(f,Docker):
     f.write('config.vm.box = \"' + Os + '\"\n')
     f.write('config.vm.network "forwarded_port", guest: 80, host: 8081\n')
     f.write('config.vm.provision "docker" do |doc|\n')
-    f.write('dock.pull_images "nginx"\n')
+    f.write('doc.pull_images "nginx"\n')
     f.write('doc.pull_images "mysql"\n')
     f.write('doc.run "mysql"\n')
     f.write('doc.run "nginx", args: "-p 80:80"\n')
@@ -25,8 +25,8 @@ def BeginVagrantFile(f,Docker):
 
 docker1 = (1,{
   "Id" : 1,
-  "Name":"docker1"
-  "Os": "ubuntu/xenial64"",
+  "Name":"docker1",
+  "Os": "ubuntu/xenial64"
 })
 
 MyNet = [docker1]

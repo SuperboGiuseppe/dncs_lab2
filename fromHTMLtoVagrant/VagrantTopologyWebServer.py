@@ -20,7 +20,7 @@ def writeWebServer(f,Web):
     Ip = Web[1]["Ip"]
 
     f.write('config.vm.define \"' + Name + '\" do |' + Name + '|\n')
-    f.write(Name + '.vm.box = "\"' + Os + '\"\n')
+    f.write(Name + '.vm.box = \"' + Os + '\"\n')
     f.write(Name + '.vm.hostname = \"' + Name + '\"\n')
     f.write(Name + '.vm.network "private_network", ip: \"' + Ip + '\" \n')
     f.write(Name + '.vm.provision "shell", inline: <<-SHELL \n')       
