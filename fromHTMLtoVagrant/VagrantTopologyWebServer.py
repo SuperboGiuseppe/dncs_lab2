@@ -119,7 +119,7 @@ def remap(newList):
 
     return MyNet
 
-def main():
+def html_to_vagrantfile(Network):
     VagrantFile = open("VagrantfileWEBSERVER", "w")
 
     #read the data structure from input
@@ -134,7 +134,8 @@ def main():
 
     #newNet = remap(listOfDevice)
 
-    Network = MyNet #RICAMBIALA CON NEWNET
+    #Network = MyNet #RICAMBIALA CON NEWNET
+    #N.B per Luca, Network è già la lista dei nodi che puoi esplorare
 
     BeginVagrantFile(VagrantFile)
     writeWebServer(VagrantFile,web1)

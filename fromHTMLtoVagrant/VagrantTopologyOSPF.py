@@ -334,22 +334,21 @@ def remap(newList):
 
     return MyNet
 
-def main():
+def html_to_vagrantfile(Network):
     VagrantFile = open("VagrantfileOSPF", "w")
 
     #read the data structure from input
     #Network = G.nodes.data():
-    file = codecs.open("NetworkGraphs/Template/OSPF_Routing_Template.html", "r", "utf-8")
-    html = file.read()
+    #file = codecs.open(network_path, "r", "utf-8")
+    #html = file.read()
 
-    if "nodes = new vis.DataSet(" in html:
-      listOfDevice = find_between(html, "nodes = new vis.DataSet(" , ")")
-      print(listOfDevice)
-      listOfDevice = yaml.load(listOfDevice) 
+    #if "nodes = new vis.DataSet(" in html:
+      #listOfDevice = find_between(html, "nodes = new vis.DataSet(" , ")")
+      #print(listOfDevice)
+      #listOfDevice = yaml.load(listOfDevice) 
 
-    newNet = remap(listOfDevice)
-
-    Network = newNet
+    #Network = remap(listOfDevice)
+    #N.B per Luca, Network è già la lista dei nodi che puoi esplorare
 
     #first, let's write the beginnig of the VagrantFile
     BeginVagrantFile(VagrantFile)

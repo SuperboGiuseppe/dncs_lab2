@@ -388,7 +388,7 @@ switch1 = (6,{
 
 fakeNet = [host1,host2,host3,rout1,rout2,switch1]
 
-def main():
+def html_to_vagrantfile(Network):
     VagrantFile = open("VagrantfileSWITCH", "w")
 
     #read the data structure from input

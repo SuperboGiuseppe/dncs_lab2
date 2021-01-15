@@ -82,7 +82,7 @@ def remap(newList):
 
     return MyNet
 
-def main():
+def html_to_vagrantfile(Network):
     VagrantFile = open("VagrantfileDOCKER", "w")
 
     #read the data structure from input
@@ -97,7 +97,8 @@ def main():
 
     #newNet = remap(listOfDevice)
 
-    Network = MyNet #RICAMBIALA CON NEWNET
+    #N.B per Luca, Network è già la lista dei nodi che puoi esplorare
+    #Network = MyNet #RICAMBIALA CON NEWNET
 
     BeginVagrantFile(VagrantFile,docker1)
 

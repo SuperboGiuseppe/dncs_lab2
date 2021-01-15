@@ -356,7 +356,7 @@ def remap(newList):
 
     return MyNet
 
-def main():
+def html_to_vagrantfile(Network):
     VagrantFile = open("VagrantfileMYSQL", "w")
 
     #read the data structure from input
@@ -370,8 +370,8 @@ def main():
     #  listOfDevice = yaml.load(listOfDevice) 
 
     #newNet = remap(listOfDevice)
-
-    Network = MyNet #DA SOSTITUIRE CON "NEW NET" ALLA FINE
+    #N.B per Luca, Network è già la lista dei nodi che puoi esplorare
+    #Network = MyNet #DA SOSTITUIRE CON "NEW NET" ALLA FINE
 
     BeginVagrantFile(VagrantFile)
 

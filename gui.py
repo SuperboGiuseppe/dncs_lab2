@@ -7,8 +7,6 @@
     _____________________________________________________________
 """
 
-
-
 import sys, os
 from PyQt5 import QtGui, QtWidgets, QtCore, uic, QtWebEngineWidgets
 from pyvis.network import Network
@@ -23,6 +21,8 @@ class network_design_window(QtWidgets.QMainWindow):
     This window contains the design network canvas and all the functionalities related to it.
 
     """
+    errorSignal = QtCore.pyqtSignal(str)
+    outputSignal = QtCore.pyqtSignal(str)
     def __init__(self):
         """Default method that initializes the instance of the main_window.
 
@@ -45,17 +45,26 @@ class network_design_window(QtWidgets.QMainWindow):
               Parameters:
                 - self: current instance of the class.
         """
-        self.current_network = Network()
-        self.current_network_name = "Test"
+        self.current_network = network_core.create_network()
+        self.current_network_name = ""
+        self.current_network_path = ""
         self.resize(1024, 768)
         self.center()
         self.setWindowTitle("Virtual Network automated deployment via Vagrant")
         self.main_toolbar()
         self.statusbar()
         self.setWindowIcon(QtGui.QIcon("./Images/network.png"))
+        self.main_frame = QtWidgets.QWidget()
+        self.main_frame_layout = QtWidgets.QVBoxLayout(self.main_frame)
+        self.setCentralWidget(self.main_frame)
         self.canvas_html()
+        self.debug_console()
         self.network_wizard = new_network_wizard(self)
         self.editor_window = editor_components(self)
+        self.dashboard_window = dashboard_vms(self)
+        self.vagrant_process = QtCore.QProcess(self)
+        self.vagrant_process.readyReadStandardOutput.connect(self.onReadyReadStandardOutput)
+        self.vagrant_process.readyReadStandardError.connect(self.onReadyReadStandardError)
 
 
     def center(self):
@@ -118,10 +127,17 @@ class network_design_window(QtWidgets.QMainWindow):
         button_vagrant = QtWidgets.QAction(QtGui.QIcon("./Images/vagrant.png"), "Label", self)
         button_vagrant.setStatusTip("Deploy the virtual network via vagrant")
         button_vagrant.setIconText("Deploy network")
+        button_vagrant.triggered.connect(lambda: self.vagrant_execution())
 
         button_dashboard = QtWidgets.QAction(QtGui.QIcon("./Images/dashboard.png"), "Label", self)
         button_dashboard.setStatusTip("Open the statistics and control dashboard of the deployed network")
         button_dashboard.setIconText("Control dashboard")
+        button_dashboard.triggered.connect(lambda: self.dashboard_window.show())
+
+        button_terminal = QtWidgets.QAction(QtGui.QIcon("./Images/terminal.png"), "Label", self)
+        button_terminal.setStatusTip("Open the debug console")
+        button_terminal.setIconText("Debug console")
+        button_terminal.triggered.connect(lambda: self.debug_console_frame.setVisible(False) if self.debug_console_frame.isVisible() else self.debug_console_frame.setVisible(True))
            
         main_toolbar.addAction(button_new)
         main_toolbar.addAction(button_save)
@@ -134,6 +150,7 @@ class network_design_window(QtWidgets.QMainWindow):
         main_toolbar.addSeparator()
         main_toolbar.addAction(button_vagrant)
         main_toolbar.addAction(button_dashboard)
+        main_toolbar.addAction(button_terminal)
 
 
     def statusbar(self):
@@ -153,8 +170,11 @@ class network_design_window(QtWidgets.QMainWindow):
                 - self: current instance of the class.
 
         """
+        QtWebEngineWidgets.QWebEngineSettings.ShowScrollBars=False
         self.canvas_frame = QtWebEngineWidgets.QWebEngineView()
-        self.setCentralWidget(self.canvas_frame)
+        self.main_frame_layout.addWidget(self.canvas_frame)
+        
+        
     
     def update_canvas_html(self, html_path):
         """Method that updates the content of the canvas with a different html network file.
@@ -174,12 +194,48 @@ class network_design_window(QtWidgets.QMainWindow):
         file_path = QtWidgets.QFileDialog.getOpenFileName(self, 'OpenFile')
         self.current_network = network_core.open_network(file_path[0])
         self.update_canvas_html(os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html"))
+        self.current_network_path = os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html")
         self.editor_window = editor_components(self)
+        self.dashboard_window = dashboard_vms(self)
     
     def save_file_window(self):
         file_path = QtWidgets.QFileDialog.getSaveFileName(self, 'SaveFile')
         self.current_network.save_graph(file_path[0])
+
+    def debug_console(self):
+        self.debug_console_frame = QtWidgets.QWidget(self.main_frame)
+        self.debug_console_layout = QtWidgets.QVBoxLayout()
+        self.debug_console_frame.setLayout(self.debug_console_layout)
+        self.debug_console_textedit = QtWidgets.QPlainTextEdit()
+        self.debug_console_textedit.setReadOnly(True)
+        self.debug_console_frame.move(5,430)
+        self.debug_console_frame.setMinimumHeight(220)
+        self.debug_console_frame.setMinimumWidth(1015)
+        self.debug_console_textedit.resize(self.debug_console_textedit.sizeHint().width(), self.debug_console_textedit.minimumHeight())
+        self.debug_console_textedit.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.debug_console_label = QtWidgets.QLabel("Debug console")
+        self.debug_console_layout.addWidget(self.debug_console_label)
+        self.debug_console_layout.addWidget(self.debug_console_textedit)
+        self.debug_console_frame.hide()
+
+    def vagrant_execution(self):
+        os.mkdir("Test")
+        os.chdir("./Test")
+        VagrantTopologyOSPF.html_to_vagrantfile(self.current_network_path)
+        self.debug_console_textedit.clear()
+        #self.vagrant_process.start('vagrant up')
+
     
+    def onReadyReadStandardOutput(self):
+        result = self.vagrant_process.readAllStandardOutput().data().decode()
+        self.debug_console_textedit.appendPlainText(result)
+        self.outputSignal.emit(result)
+    
+    def onReadyReadStandardError(self):
+        error = self.vagrant_process.readAllStandardError().data().decode()
+        self.debug_console_textedit.appendPlainText(error)
+        self.errorSignal.emit(error)
+        
         
 
 class new_network_wizard(QtWidgets.QWizard):
@@ -341,6 +397,69 @@ class new_network_wizard(QtWidgets.QWizard):
             print(self.scratch_page.field("network_name_scratch"))
             self.main_window_object.current_network_name = self.template_page.field("network_path")
 
+
+
+class dashboard_vms(QtWidgets.QMainWindow):
+
+    def __init__(self, main_window):
+        super(dashboard_vms, self).__init__()
+        self.main_window_object = main_window
+        self.layout = QtWidgets.QVBoxLayout(self)
+        self.setWindowTitle("Control dashboard")
+        self.setWindowIcon(QtGui.QIcon("./Images/dashboard.png"))
+        self.label_combobox = QtWidgets.QLabel("Select the virtual machine:")
+        self.vm_combobox = QtWidgets.QComboBox()
+        self.vm_names()
+        self.graphs_frame = QtWidgets.QWidget()
+        self.graphs_frame_layout = QtWidgets.QGridLayout()
+        self.images_placeholder()
+        self.graphs_frame.setLayout(self.graphs_frame_layout)
+        self.button_frame = QtWidgets.QWidget()
+        self.button_layout = QtWidgets.QHBoxLayout()
+        self.button_layout.setAlignment(QtCore.Qt.AlignRight)
+        self.button_ssh = QtWidgets.QPushButton("SSH Connection")
+        self.button_ssh.clicked.connect(self.ssh_connection)
+        self.button_cancel = QtWidgets.QPushButton("Cancel")
+        self.button_layout.addWidget(self.button_ssh)
+        self.button_layout.addWidget(self.button_cancel)
+        self.button_frame.setLayout(self.button_layout)
+        self.layout.addWidget(self.label_combobox)
+        self.layout.addWidget(self.vm_combobox)
+        self.layout.addWidget(self.graphs_frame)
+        self.layout.addWidget(self.button_frame)
+        self.window = QtWidgets.QWidget()
+        self.window.setLayout(self.layout)
+        self.setCentralWidget(self.window)
+
+    def ssh_connection(self):
+        current_vm = self.vm_combobox.currentText()
+        command = "start cmd /k vagrant ssh " + current_vm
+        os.system(command)
+    
+    def vm_names(self):
+        nodes = self.main_window_object.current_network.nodes
+        for node in nodes:
+            self.vm_combobox.addItem(node["label"])
+
+    def images_placeholder(self):
+        self.label_matrix = []
+        self.label_list1 = []
+        self.label_list2 = []
+        self.pixmap = QtGui.QPixmap('./Images/placeholder.png')
+        self.pixmap2 = self.pixmap.scaledToHeight(300)
+        for x in range(3):
+            label = QtWidgets.QLabel()
+            label.setPixmap(self.pixmap2)
+            self.label_list1.append(label)
+            label = QtWidgets.QLabel()
+            label.setPixmap(self.pixmap2)
+            self.label_list2.append(label)
+        self.label_matrix.append(self.label_list1)
+        self.label_matrix.append(self.label_list2)
+        for x in range(2):
+            for y in range(3):
+                self.graphs_frame_layout.addWidget(self.label_matrix[x][y], x, y)
+            
 class editor_components(QtWidgets.QMainWindow):
     """
     Class from which it is possible to instantiate the device editor window. 
@@ -373,7 +492,7 @@ class editor_components(QtWidgets.QMainWindow):
         super(editor_components, self).__init__()
         self.main_window_object = main_window
         self.temporary_network = self.main_window_object.current_network
-        print(self.temporary_network.nodes)
+        #print(self.temporary_network.nodes)
         self.resize(1024, 768)
         self.setWindowTitle("Editor virtual devices configuration")
         self.setWindowIcon(QtGui.QIcon("./Images/network.png"))
