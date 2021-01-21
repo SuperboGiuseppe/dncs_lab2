@@ -15,6 +15,7 @@ Automating the deployment of network setups using vagrant
 -	Traditional web server and database setup
 -	web server (nginx and PHP) on one machine and our database server (MySQL) on another
 -	Our Vagrant file only step up the environment. The other configuration user can make according to desire of the user.
+- Added a new script for server-client socket.
 
 
 # Modification By Giuseppe
