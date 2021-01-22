@@ -393,7 +393,8 @@ def html_to_vagrantfile(Network):
 
     #read the data structure from input
     #Network = G.nodes.data():
-    Network = fakeNet
+    #Network = fakeNet
+    #N.B per Luca, Network è già la lista dei nodi che puoi esplorare
 
     #first, let's write the beginnig of the VagrantFile
     BeginVagrantFile(VagrantFile,Network)
@@ -427,4 +428,4 @@ def html_to_vagrantfile(Network):
     VagrantFile.write("end\n")
     VagrantFile.close()
 
-main()
+

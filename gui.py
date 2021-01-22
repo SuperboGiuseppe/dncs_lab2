@@ -14,6 +14,12 @@ import matplotlib.image as mpimg
 import numpy
 import network_core
 
+"""
+Custom Libraries
+"""
+custom_lib_path = os.path.abspath(os.path.abspath("./fromHTMLtoVagrant"))
+sys.path.append(custom_lib_path)
+import vagrantConverterCollector
 
 class network_design_window(QtWidgets.QMainWindow):
     """
@@ -48,6 +54,7 @@ class network_design_window(QtWidgets.QMainWindow):
         self.current_network = network_core.create_network()
         self.current_network_name = ""
         self.current_network_path = ""
+        self.current_network_deployed = 0
         self.resize(1024, 768)
         self.center()
         self.setWindowTitle("Virtual Network automated deployment via Vagrant")
@@ -62,6 +69,7 @@ class network_design_window(QtWidgets.QMainWindow):
         self.network_wizard = new_network_wizard(self)
         self.editor_window = editor_components(self)
         self.dashboard_window = dashboard_vms(self)
+        self.edge_window = edge_editors(self)
         self.vagrant_process = QtCore.QProcess(self)
         self.vagrant_process.readyReadStandardOutput.connect(self.onReadyReadStandardOutput)
         self.vagrant_process.readyReadStandardError.connect(self.onReadyReadStandardError)
@@ -87,70 +95,96 @@ class network_design_window(QtWidgets.QMainWindow):
                 - self: current instance of the class.
 
         """       
-        main_toolbar = QtWidgets.QToolBar(self)
-        self.addToolBar(QtCore.Qt.TopToolBarArea, main_toolbar)
-        main_toolbar.setIconSize(QtCore.QSize(64,64))
-        main_toolbar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
+        self.main_toolbar = QtWidgets.QToolBar(self)
+        self.addToolBar(QtCore.Qt.TopToolBarArea, self.main_toolbar)
+        self.main_toolbar.setIconSize(QtCore.QSize(64,64))
+        self.main_toolbar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
         
-        button_router = QtWidgets.QAction(QtGui.QIcon("./Images/router.png"), "Label", self)
-        button_router.setStatusTip("Add a router to the network")
-        button_router.setIconText("Router")
+        self.button_router = QtWidgets.QAction(QtGui.QIcon("./Images/router.png"), "Label", self)
+        self.button_router.setStatusTip("Add a router to the network")
+        self.button_router.setToolTip("Add a router to the network")
+        self.button_router.setIconText("Router")
+        self.button_router.setDisabled(True)
         
-        button_switch = QtWidgets.QAction(QtGui.QIcon("./Images/switch.png"), "Label", self)
-        button_switch.setStatusTip("Add a switch to the network")
-        button_switch.setIconText("Switch")
+        self.button_switch = QtWidgets.QAction(QtGui.QIcon("./Images/switch.png"), "Label", self)
+        self.button_switch.setStatusTip("Add a switch to the network")
+        self.button_switch.setToolTip("Add a switch to the network")
+        self.button_switch.setIconText("Switch")
+        self.button_switch.setDisabled(True)
 
-        button_host = QtWidgets.QAction(QtGui.QIcon("./Images/host.png"), "Label", self)
-        button_host.setStatusTip("Add a host to the network")
-        button_host.setIconText("Host")
+        self.button_host = QtWidgets.QAction(QtGui.QIcon("./Images/host.png"), "Label", self)
+        self.button_host.setStatusTip("Add a host to the network")
+        self.button_host.setToolTip("Add a host to the network")
+        self.button_host.setIconText("Host")
+        self.button_host.setDisabled(True)
 
-        button_editor = QtWidgets.QAction(QtGui.QIcon("./Images/tool.png"), "Label", self)
-        button_editor.setStatusTip("Edit virtual network devices")
-        button_editor.setIconText("Edit configuration")
-        button_editor.triggered.connect(lambda: self.editor_window.show())
+        self.button_editor = QtWidgets.QAction(QtGui.QIcon("./Images/tool.png"), "Label", self)
+        self.button_editor.setStatusTip("Edit virtual network devices")
+        self.button_editor.setToolTip("Edit virtual network devices")
+        self.button_editor.setIconText("Edit configuration")
+        self.button_editor.triggered.connect(lambda: self.editor_window.show())
+        self.button_editor.setDisabled(True)
 
-        button_new = QtWidgets.QAction(QtGui.QIcon("./Images/newfile.png"), "Label", self)
-        button_new.setStatusTip("Create a new network")
-        button_new.setIconText("New Network")
-        button_new.triggered.connect(lambda: self.network_wizard.show())
+        self.button_edge = QtWidgets.QAction(QtGui.QIcon("./Images/edge.png"), "Label", self)
+        self.button_edge.setStatusTip("Edit edge/link characteristics")
+        self.button_edge.setToolTip("Edit edge/link characteristics")
+        self.button_edge.setIconText("Edge configuration")
+        self.button_edge.triggered.connect(lambda: self.edge_window.show())
+        self.button_edge.setDisabled(True)
 
-        button_save = QtWidgets.QAction(QtGui.QIcon("./Images/save.png"), "Label", self)
-        button_save.setStatusTip("Save the current network")
-        button_save.setIconText("Save Network")
-        button_save.triggered.connect(lambda: self.save_file_window())
+        self.button_new = QtWidgets.QAction(QtGui.QIcon("./Images/newfile.png"), "Label", self)
+        self.button_new.setStatusTip("Create a new network")
+        self.button_new.setToolTip("Create a new network")
+        self.button_new.setIconText("New Network")
+        self.button_new.triggered.connect(lambda: self.network_wizard.show())
 
-        button_open = QtWidgets.QAction(QtGui.QIcon("./Images/openfile.png"), "Label", self)
-        button_open.setStatusTip("Open an existent network")
-        button_open.setIconText("Open Network")
-        button_open.triggered.connect(lambda: self.open_file_window())
+        self.button_save = QtWidgets.QAction(QtGui.QIcon("./Images/save.png"), "Label", self)
+        self.button_save.setStatusTip("Save the current network")
+        self.button_save.setToolTip("Save the current network")
+        self.button_save.setIconText("Save Network")
+        self.button_save.triggered.connect(lambda: self.save_file_window())
+        self.button_save.setDisabled(True)
 
-        button_vagrant = QtWidgets.QAction(QtGui.QIcon("./Images/vagrant.png"), "Label", self)
-        button_vagrant.setStatusTip("Deploy the virtual network via vagrant")
-        button_vagrant.setIconText("Deploy network")
-        button_vagrant.triggered.connect(lambda: self.vagrant_execution())
+        self.button_open = QtWidgets.QAction(QtGui.QIcon("./Images/openfile.png"), "Label", self)
+        self.button_open.setStatusTip("Open an existent network")
+        self.button_open.setToolTip("Open an existent network")
+        self.button_open.setIconText("Open Network")
+        self.button_open.triggered.connect(lambda: self.open_file_window())
 
-        button_dashboard = QtWidgets.QAction(QtGui.QIcon("./Images/dashboard.png"), "Label", self)
-        button_dashboard.setStatusTip("Open the statistics and control dashboard of the deployed network")
-        button_dashboard.setIconText("Control dashboard")
-        button_dashboard.triggered.connect(lambda: self.dashboard_window.show())
+        self.button_vagrant = QtWidgets.QAction(QtGui.QIcon("./Images/vagrant.png"), "Label", self)
+        self.button_vagrant.setStatusTip("Deploy the virtual network via vagrant")
+        self.button_vagrant.setToolTip("Deploy the virtual network via vagrant")
+        self.button_vagrant.setIconText("Deploy network")
+        self.button_vagrant.triggered.connect(lambda: self.vagrant_execution())
+        self.button_vagrant.setDisabled(True)
 
-        button_terminal = QtWidgets.QAction(QtGui.QIcon("./Images/terminal.png"), "Label", self)
-        button_terminal.setStatusTip("Open the debug console")
-        button_terminal.setIconText("Debug console")
-        button_terminal.triggered.connect(lambda: self.debug_console_frame.setVisible(False) if self.debug_console_frame.isVisible() else self.debug_console_frame.setVisible(True))
+        self.button_dashboard = QtWidgets.QAction(QtGui.QIcon("./Images/dashboard.png"), "Label", self)
+        self.button_dashboard.setStatusTip("Open the statistics and control dashboard of the deployed network")
+        self.button_dashboard.setToolTip("Open the statistics and control dashboard of the deployed network")
+        self.button_dashboard.setIconText("Control dashboard")
+        self.button_dashboard.triggered.connect(lambda: self.dashboard_window.show())
+        self.button_dashboard.setDisabled(True)
+
+        self.button_terminal = QtWidgets.QAction(QtGui.QIcon("./Images/terminal.png"), "Label", self)
+        self.button_terminal.setStatusTip("Open the debug console")
+        self.button_terminal.setToolTip("Open the debug console")
+        self.button_terminal.setIconText("Debug console")
+        self.button_terminal.triggered.connect(lambda: self.debug_console_frame.setVisible(False) if self.debug_console_frame.isVisible() else self.debug_console_frame.setVisible(True))
            
-        main_toolbar.addAction(button_new)
-        main_toolbar.addAction(button_save)
-        main_toolbar.addAction(button_open)
-        main_toolbar.addSeparator()
-        main_toolbar.addAction(button_router)
-        main_toolbar.addAction(button_switch)
-        main_toolbar.addAction(button_host)
-        main_toolbar.addAction(button_editor)
-        main_toolbar.addSeparator()
-        main_toolbar.addAction(button_vagrant)
-        main_toolbar.addAction(button_dashboard)
-        main_toolbar.addAction(button_terminal)
+        
+        self.main_toolbar.addAction(self.button_new)
+        self.main_toolbar.addAction(self.button_save)
+        self.main_toolbar.addAction(self.button_open)
+        self.main_toolbar.addSeparator()
+        self.main_toolbar.addAction(self.button_router)
+        self.main_toolbar.addAction(self.button_switch)
+        self.main_toolbar.addAction(self.button_host)
+        self.main_toolbar.addAction(self.button_editor)
+        self.main_toolbar.addAction(self.button_edge)
+        self.main_toolbar.addSeparator()
+        self.main_toolbar.addAction(self.button_vagrant)
+        self.main_toolbar.addAction(self.button_dashboard)
+        self.main_toolbar.addAction(self.button_terminal)
 
 
     def statusbar(self):
@@ -163,6 +197,13 @@ class network_design_window(QtWidgets.QMainWindow):
         self.statusBar().showMessage("No deployed network")
 
 
+    def enable_buttons_editing(self):
+        self.button_save.setEnabled(True)
+        self.button_vagrant.setEnabled(True)
+        self.button_editor.setEnabled(True)
+        self.button_edge.setEnabled(True)
+        
+    
     def canvas_html(self):
         """Method that defines the canvas where the network is prompted.
 
@@ -184,6 +225,7 @@ class network_design_window(QtWidgets.QMainWindow):
                 - html_path: absolute path of the html network file.
         """
         self.canvas_frame.load(QtCore.QUrl.fromLocalFile(html_path))
+        
     
     def open_file_window(self):
         """Method that prompt an explorer window for opening a new html network file.
@@ -197,6 +239,9 @@ class network_design_window(QtWidgets.QMainWindow):
         self.current_network_path = os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html")
         self.editor_window = editor_components(self)
         self.dashboard_window = dashboard_vms(self)
+        self.edge_window = edge_editors(self)
+        self.enable_buttons_editing()
+        
     
     def save_file_window(self):
         file_path = QtWidgets.QFileDialog.getSaveFileName(self, 'SaveFile')
@@ -221,7 +266,7 @@ class network_design_window(QtWidgets.QMainWindow):
     def vagrant_execution(self):
         os.mkdir("Test")
         os.chdir("./Test")
-        VagrantTopologyOSPF.html_to_vagrantfile(self.current_network_path)
+        vagrantConverterCollector.converter_selector(self.current_network_path, "OSPF")
         self.debug_console_textedit.clear()
         #self.vagrant_process.start('vagrant up')
 
@@ -237,7 +282,6 @@ class network_design_window(QtWidgets.QMainWindow):
         self.errorSignal.emit(error)
         
         
-
 class new_network_wizard(QtWidgets.QWizard):
     """
     Class from which it is possible to instantiate the wizard window. 
@@ -367,7 +411,6 @@ class new_network_wizard(QtWidgets.QWizard):
         preview_frame = QtWebEngineWidgets.QWebEngineView(page)
         preview_frame.load(QtCore.QUrl.fromLocalFile(self.templates_directory_path + "/" + str(templates_combobox.currentText())))
         preview_frame.setFixedSize(600,350)
-        preview_frame.page().settings().setAttribute(QtWebEngineWidgets.QWebEngineSettings.ShowScrollBars, False)
         preview_frame.setZoomFactor(0.65)
         preview_frame.page().runJavaScript("window.scrollTo(100,100)")
         templates_combobox.activated[str].connect(lambda: preview_frame.load(QtCore.QUrl.fromLocalFile(self.templates_directory_path + "/" + str(templates_combobox.currentText()))))
@@ -391,12 +434,17 @@ class new_network_wizard(QtWidgets.QWizard):
 
         """
         if self.currentId() == self.template_id:
-            self.main_window_object.current_network = network_core.open_network(self.templates_directory_path + "/" + self.template_page.field("network_path"))
+            #print(self.templates_directory_path + "\\" + self.template_page.field("network_path"))
+            self.main_window_object.current_network = network_core.open_network(self.templates_directory_path + "\\" + self.template_page.field("network_path"))
             self.main_window_object.current_network_name = self.template_page.field("network_path")
+            self.main_window_object.update_canvas_html(os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html"))
+            self.main_window_object.current_network_path = os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html")
+            self.main_window_object.editor_window = editor_components(self.main_window_object)
+            self.main_window_object.dashboard_window = dashboard_vms(self.main_window_object)
+            self.main_window_object.enable_buttons_editing()
         else:
             print(self.scratch_page.field("network_name_scratch"))
             self.main_window_object.current_network_name = self.template_page.field("network_path")
-
 
 
 class dashboard_vms(QtWidgets.QMainWindow):
@@ -459,7 +507,8 @@ class dashboard_vms(QtWidgets.QMainWindow):
         for x in range(2):
             for y in range(3):
                 self.graphs_frame_layout.addWidget(self.label_matrix[x][y], x, y)
-            
+
+
 class editor_components(QtWidgets.QMainWindow):
     """
     Class from which it is possible to instantiate the device editor window. 
@@ -600,10 +649,17 @@ class editor_components(QtWidgets.QMainWindow):
             network_configuration_table.verticalHeader().hide()
             form_layout.addWidget(network_configuration_table, 3, 0, 1, 2)
 
-            self.set_qlines_text(edit_lines, devices, devices_combobox.currentIndex())
+            form_layout.addWidget(QtWidgets.QLabel("Custom script:"), 4, 0)
+            
+            custom_script_textbox = QtWidgets.QTextEdit()
+            form_layout.addWidget(custom_script_textbox, 5,0,1,2)
+            custom_script_textbox.textChanged.connect(lambda: (self.temporary_edits("custom_script", custom_script_textbox.toPlainText(), devices, devices_combobox.currentIndex())))
+
+
+            self.set_qlines_text(edit_lines, devices, devices_combobox.currentIndex(), custom_script_textbox)
             self.set_network_table_content(network_configuration_table, devices, devices_combobox.currentIndex())
             network_configuration_table.cellChanged.connect(lambda: self.table_edits(network_configuration_table, devices, devices_combobox.currentIndex())) 
-            devices_combobox.activated[str].connect(lambda: (self.set_qlines_text(edit_lines, devices, devices_combobox.currentIndex()), self.set_network_table_content(network_configuration_table, devices, devices_combobox.currentIndex())))
+            devices_combobox.activated[str].connect(lambda: (self.set_qlines_text(edit_lines, devices, devices_combobox.currentIndex(), custom_script_textbox), self.set_network_table_content(network_configuration_table, devices, devices_combobox.currentIndex())))
 
             window_layout.addWidget(devices_label)
             window_layout.addWidget(devices_combobox)
@@ -613,7 +669,7 @@ class editor_components(QtWidgets.QMainWindow):
             tab_layout.addWidget(QtWidgets.QLabel("No " + type.lower() + " devices available in the network"))
         return tab
 
-    def set_qlines_text(self, edit_lines, devices, index):
+    def set_qlines_text(self, edit_lines, devices, index, custom_script_textbox):
         """Method that applies all the current configuration values in the specific form.
 
               Parameters:
@@ -627,6 +683,8 @@ class editor_components(QtWidgets.QMainWindow):
         edit_lines["vm_image"].setText(devices[index]["vm_image"])
         edit_lines["ram"].setText(devices[index]["ram"])
         edit_lines["number_cpus"].setText(str(devices[index]["n_cpus"]))
+        custom_script_textbox.setPlainText(devices[index]["custom_script"])
+
     
     def set_network_table_content(self, table, devices, index):
         """Method that applies all the current configuration values in the specific network configuration table.
@@ -704,6 +762,78 @@ class editor_components(QtWidgets.QMainWindow):
         network_core.html_fix(os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html"))
         self.main_window_object.update_canvas_html(os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html"))
         self.close()
+
+
+class edge_editors(QtWidgets.QMainWindow):
+    
+    def __init__(self, main_window):
+        super(edge_editors, self).__init__()
+        self.main_window_object = main_window
+        self.temporary_network = self.main_window_object.current_network
+        self.setWindowIcon(QtGui.QIcon("./Images/edge.png"))
+        self.setWindowTitle("Edit edges configuration")
+        self.resize(512, 280)
+        self.window_layout = QtWidgets.QGridLayout(self)
+        self.edge_combobox = QtWidgets.QComboBox()
+        self.edge_combobox.activated[str].connect(lambda: self.bandwidth_textbox.setText(str(self.edges[self.edge_combobox.currentIndex()]["bandwidth"])))
+        self.collect_edges()
+        self.bandwidth_textbox = QtWidgets.QLineEdit()
+        self.bandwidth_textbox.textChanged[str].connect(lambda: (self.bandwidth_changes(self.edges, self.edge_combobox.currentIndex(), self.bandwidth_textbox.text())))
+        if len(self.edges) > 0:
+            self.bandwidth_textbox.setText(str(self.edges[self.edge_combobox.currentIndex()]["bandwidth"]))
+        self.button_frame = QtWidgets.QWidget()
+        self.button_layout = QtWidgets.QHBoxLayout()
+        self.button_layout.setAlignment(QtCore.Qt.AlignRight)
+        self.button_save = QtWidgets.QPushButton("Save")
+        self.button_save.clicked.connect(self.on_save)
+        self.button_cancel = QtWidgets.QPushButton("Cancel")
+        self.button_cancel.clicked.connect(self.on_close)
+        self.button_layout.addWidget(self.button_save)
+        self.button_layout.addWidget(self.button_cancel)
+        self.button_frame.setLayout(self.button_layout)
+        self.window_layout.addWidget(QtWidgets.QLabel("Select the edge:"), 0, 0)
+        self.window_layout.addWidget(self.edge_combobox, 1, 0, 1, 2)
+        self.window_layout.addWidget(QtWidgets.QLabel("Bandwidth (Mbps):"), 2, 0)
+        self.window_layout.addWidget(self.bandwidth_textbox, 2,1)
+        self.window_layout.addItem(QtWidgets.QSpacerItem(400, 220), 3, 0, 1, 2)
+        self.window_layout.addWidget(self.button_frame, 4, 0, 1, 2)
+        self.window = QtWidgets.QWidget()
+        self.window.setLayout(self.window_layout)
+        self.setCentralWidget(self.window)
+
+    
+    def collect_edges(self):
+        self.edges = self.temporary_network.edges
+        self.devices = self.temporary_network.nodes
+        for edge in self.edges:
+            self.edge_combobox.addItem(self.devices[edge["from"]-1]["label"] + " <----> " + self.devices[edge["to"]-1]["label"])
+    
+    def bandwidth_changes(self, edges, index, new_value):
+            if new_value == "":
+                edges[index]["bandwidth"] = 0
+            else:
+                edges[index]["bandwidth"] = int(new_value)
+
+    def on_save(self):
+        """Method called when the user presses the save button in the editor configuration. It applies the changes in the temporary network and updates the network graph of the canvas.
+
+              Parameters:
+                - self: current instance of the class;
+
+        """        
+        G = Network()
+        network_core.dictionary_to_nodes(self.devices, G)
+        network_core.dictionary_to_edges(self.edges, G)
+        self.main_window_object.current_network = G
+        G.save_graph("./NetworkGraphs/Temp_Network/temp_network.html")
+        network_core.html_fix(os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html"))
+        self.main_window_object.update_canvas_html(os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html"))
+        self.close()
+    
+    def on_close(self):
+        self.close()
+
+
 
 
 def main_application():

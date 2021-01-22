@@ -283,14 +283,6 @@ rout3 = (3,{
 
 MyNet = [host1,host2,host3,rout1,rout2,rout3]
 
-def find_between( s, first, last ):
-    try:
-        start = s.index( first ) + len( first )
-        end = s.index( last, start )
-        return s[start:end]
-    except ValueError:
-        return ""
-
 def remap(newList):
     print("-------------------")
 
@@ -334,7 +326,7 @@ def remap(newList):
 
     return MyNet
 
-def html_to_vagrantfile(Network):
+def html_to_vagrantfile(listOfDevice):
     VagrantFile = open("VagrantfileOSPF", "w")
 
     #read the data structure from input
@@ -347,7 +339,8 @@ def html_to_vagrantfile(Network):
       #print(listOfDevice)
       #listOfDevice = yaml.load(listOfDevice) 
 
-    #Network = remap(listOfDevice)
+
+    Network = remap(listOfDevice)
     #N.B per Luca, Network è già la lista dei nodi che puoi esplorare
 
     #first, let's write the beginnig of the VagrantFile
@@ -375,6 +368,3 @@ def html_to_vagrantfile(Network):
 
     VagrantFile.write("end\n")
     VagrantFile.close()
-
-
-main()

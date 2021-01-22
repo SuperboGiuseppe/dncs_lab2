@@ -1,5 +1,4 @@
-import ipcalc 
-import codecs
+import ipcalc
 import yaml
 
 #this function writes the beginning of the VagrantFile
@@ -403,5 +402,3 @@ def html_to_vagrantfile(Network):
 
     #VagrantFile.write("end\n")
     VagrantFile.close()
-
-main()
