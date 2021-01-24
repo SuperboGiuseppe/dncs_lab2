@@ -27,7 +27,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/SuperboGiuseppe/dncs_lab2">
-    <img src="images/logo1.png" alt="Logo" width="80" height="80">
+    <img src="Images/logo1.png" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">AUTOMATING THE DEPLOYMENT OF NETWORK SETUPS USING VAGRANT</h3>
@@ -204,4 +204,4 @@ Project Link: [AUTOMATING THE DEPLOYMENT OF NETWORK SETUPS USING VAGRANT](https:
 [issues-url]: https://github.com/SuperboGiuseppe/dncs_lab2/issues
 [license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
 [license-url]: https://github.com/othneildrew/Best-README-Template/blob/master/LICENSE.txt
-[product-screenshot]: images/screenshot.png
+[product-screenshot]: Images/screenshot.png
