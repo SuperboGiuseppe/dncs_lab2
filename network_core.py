@@ -66,7 +66,7 @@ def dictionary_to_nodes(dictionary, network):
 
     """
     for node in dictionary:
-        network.add_node(node["id"], image=node["image"], label=node["label"], shape=node["shape"], type=node["type"], network_interfaces=node["network_interfaces"], vm_image=node["vm_image"], ram=node["ram"], n_cpus=node["n_cpus"])
+        network.add_node(node["id"], image=node["image"], label=node["label"], shape=node["shape"], type=node["type"], network_interfaces=node["network_interfaces"], vm_image=node["vm_image"], ram=node["ram"], n_cpus=node["n_cpus"], custom_script=node["custom_script"])
 
 
 def dictionary_to_edges(dictionary, network):
@@ -78,7 +78,7 @@ def dictionary_to_edges(dictionary, network):
 
     """
     for edge in dictionary:
-        network.add_edge(edge["from"],edge["to"])
+        network.add_edge(edge["from"],edge["to"], bandwidth=edge["bandwidth"])
 
 def nodes_search_type(network, search_type):
     """Function that returns only a specific type of nodes of a network

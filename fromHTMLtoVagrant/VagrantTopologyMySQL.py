@@ -1,5 +1,4 @@
-import ipcalc 
-import codecs
+import ipcalc
 import yaml
 
 #this function writes the beginning of the VagrantFile
@@ -37,6 +36,7 @@ def writeHost(f,Host):
     Name = Host[1]["Name"]
     Ram = Host[1]["Ram"]
     Os  = Host[1]["Os"]
+    CustumScript = Host[1]["custom_script"]
     
     Ip = Host[1]["Network"][0]["Ip"]
     Netmask = Host[1]["Network"][0]["Netmask"]
@@ -60,6 +60,10 @@ def writeHost(f,Host):
     f.write("echo \"Static Routig configuration Started for " + Name + "\"\n")
     f.write("sudo sysctl -w net.ipv4.ip_forward=1\n")
     f.write("sudo route add -net " + str(IpNet) + " netmask " + Netmask + " gw " + Gateway + " dev " + Interface + "\n")
+
+    #here there is the custum script
+    f.write(CustumScript + " \n")
+
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write("SHELL\n")
@@ -74,6 +78,7 @@ def writeWebServer(f,Web):
     Name = Web[1]["Name"]
     Ram = Web[1]["Ram"]
     Os  = Web[1]["Os"]
+    CustumScript = Web[1]["custom_script"]
     
     Ip = Web[1]["Network"][0]["Ip"]
     Netmask = Web[1]["Network"][0]["Netmask"]
@@ -93,6 +98,10 @@ def writeWebServer(f,Web):
     f.write('echo "Static Routig configuration Started for ' + Name + '\"\n')
     f.write('sudo sysctl -w net.ipv4.ip_forward=1\n')
     f.write("sudo route add -net " + str(IpNet) + " netmask " + Netmask + " gw " + Gateway + " dev " + Interface + "\n")
+
+    #here there is the custum script
+    f.write(CustumScript + " \n")
+
     f.write('echo "Configuration END"\n')
     f.write('#echo ' + Name + ' is ready to Use"\n')
     f.write('SHELL\n')
@@ -113,6 +122,7 @@ def writeDatabase(f,Db):
     Name = Db[1]["Name"]
     Ram = Db[1]["Ram"]
     Os  = Db[1]["Os"]
+    CustumScript = Db[1]["custom_script"]
 
     Ip = Db[1]["Network"][0]["Ip"]
     Netmask = Db[1]["Network"][0]["Netmask"]
@@ -132,6 +142,10 @@ def writeDatabase(f,Db):
     f.write('echo "Static Routig configuration Started for db-1"\n')
     f.write('sudo sysctl -w net.ipv4.ip_forward=1\n')
     f.write("sudo route add -net " + str(IpNet) + " netmask " + Netmask + " gw " + Gateway + " dev " + Interface + "\n")
+
+    #here there is the custum script
+    f.write(CustumScript + " \n")
+
     f.write('echo "Configuration END"\n')
     f.write('#echo "Host--B is ready to Use"	\n')
     f.write('SHELL\n')
@@ -231,6 +245,10 @@ def writeRouter(f,Router):
     f.write("exit\n")
     f.write("ip forwarding\n")
     f.write("exit'\n")
+
+    #here there is the custum script
+    f.write(CustumScript + " \n")
+
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write("SHELL\n")
@@ -249,6 +267,7 @@ host1 = (1,{
   "Type": "Host",
   "Ram": "1024",
   "Os": "bento/ubuntu-16.04",
+  "custom_script":"echo 'THIS IS CUSTUM SCRIPT'",
   "Network" : [{
     "Ip": "192.168.10.10/24",
     "Netmask": "255.255.255.0",
@@ -262,6 +281,7 @@ rout1 = (2,{
   "Type": "Router",
   "Ram": "1024",
   "Os": "bento/ubuntu-16.04",
+  "custom_script":"echo 'THIS IS CUSTUM SCRIPT'",
   "Network" : [{
     "Ip": "192.168.10.2/24",
     "Netmask": "255.255.255.0",
@@ -283,6 +303,7 @@ web1 = (3,{
   "Type": "Web",
   "Ram": "1024",
   "Os": "bento/ubuntu-16.04",
+  "custom_script":"echo 'THIS IS CUSTUM SCRIPT'",
   "Network" : [{
     "Ip": "192.168.10.11/24",
     "Netmask": "255.255.255.0",
@@ -296,6 +317,7 @@ db1 = (4,{
   "Type": "Db",
   "Ram": "1024",
   "Os": "bento/ubuntu-16.04",
+  "custom_script":"echo 'THIS IS CUSTUM SCRIPT'",
   "Network" : [{
     "Ip": "192.168.10.12/24",
     "Netmask": "255.255.255.0",
@@ -403,5 +425,3 @@ def html_to_vagrantfile(Network):
 
     #VagrantFile.write("end\n")
     VagrantFile.close()
-
-main()

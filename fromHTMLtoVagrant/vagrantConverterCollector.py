@@ -1,4 +1,15 @@
 import VagrantTopologyOSPF, VagrantTopologyDocker, VagrantTopologyMySQL, VagrantTopologySwitch, VagrantTopologyWebServer
+import codecs
+import yaml
+
+
+def find_between( s, first, last ):
+    try:
+        start = s.index( first ) + len( first )
+        end = s.index( last, start )
+        return s[start:end]
+    except ValueError:
+        return ""
 
 def extract_nodes(network_path):
     file = codecs.open(network_path, "r", "utf-8")
@@ -9,16 +20,15 @@ def extract_nodes(network_path):
       print(listOfDevice)
       listOfDevice = yaml.load(listOfDevice) 
 
-    network = remap(listOfDevice)
-    return network
+    return listOfDevice
 
 def converter_selector(network_path, template):
-    extract_nodes(network_path)
+    network = extract_nodes(network_path)
     if(template == "OSPF"):
         VagrantTopologyOSPF.html_to_vagrantfile(network)
     if(template == "Docker"):
         VagrantTopologyDocker.html_to_vagrantfile(network)
-    if(template == "MySQL")
+    if(template == "MySQL"):
         VagrantTopologyMySQL.html_to_vagrantfile(network)
     if(template == "Switch"):
         VagrantTopologySwitch.html_to_vagrantfile(network)

@@ -32,6 +32,7 @@ def writeHost(f,Host):
     Name = Host[1]["Name"]
     Ram = Host[1]["Ram"]
     Os  = Host[1]["Os"]
+    CustumScript = Host[1]["custom_script"]
     
     Ip = Host[1]["Network"][0]["Ip"]
     Netmask = Host[1]["Network"][0]["Netmask"]
@@ -61,6 +62,10 @@ def writeHost(f,Host):
     f.write("echo \"Static Routig configuration Started for " + Name + "\"\n")
     f.write("sudo sysctl -w net.ipv4.ip_forward=1\n")
     f.write("sudo route add -net " + str(IpNet) + " netmask " + Netmask + " gw " + Gateway + " dev " + Interface + "\n")
+
+    #here there is the custum script
+    f.write(CustumScript + " \n")
+
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write("SHELL\n")
@@ -82,6 +87,7 @@ def writeRouter(f,Router):
     Name = Router[1]["Name"]
     Ram = Router[1]["Ram"]
     Os  = Router[1]["Os"]
+    CustumScript = Router[1]["custom_script"]
 
     Ip1 = Router[1]["Network"][0]["Ip"]
     Netmask1 = Router[1]["Network"][0]["Netmask"]
@@ -170,6 +176,10 @@ def writeRouter(f,Router):
     f.write("exit\n")
     f.write("ip forwarding\n")
     f.write("exit'\n")
+
+    #here there is the custum script
+    f.write(CustumScript + " \n")
+
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write("SHELL\n")
@@ -189,6 +199,7 @@ host1 = (4,{
   "Type": "Host",
   "Ram": "1024",
   "Os": "bento/ubuntu-16.04",
+  "custom_script":"echo 'THIS IS CUSTUM SCRIPT'",
   "Network" : [{
     "Ip": "192.168.1.1/24",
     "Netmask": "255.255.255.0",
@@ -201,6 +212,7 @@ host2 = (5,{
   "Type": "Host",
   "Ram": "1024",
   "Os": "bento/ubuntu-16.04",
+  "custom_script":"echo 'THIS IS CUSTUM SCRIPT'",
   "Network" : [{
     "Ip": "192.168.2.1/24",
     "Netmask": "255.255.255.0",
@@ -213,6 +225,7 @@ host3 = (6,{
   "Type": "Host",
   "Ram": "1024",
   "Os": "bento/ubuntu-16.04",
+  "custom_script":"echo 'THIS IS CUSTUM SCRIPT'",
   "Network" : [{
     "Ip": "192.168.3.1/24",
     "Netmask": "255.255.255.0",
@@ -226,6 +239,7 @@ rout1 = (1,{
   "Type": "Router",
   "Ram": "1024",
   "Os": "bento/ubuntu-16.04",
+  "custom_script": "echo 'THIS IS CUSTUM SCRIPT'",
   "Network" : [{
     "Ip": "192.168.1.254/24",
     "Netmask": "255.255.255.0",
@@ -246,6 +260,7 @@ rout2 = (2,{
   "Type": "Router",
   "Ram": "1024",
   "Os": "bento/ubuntu-16.04",
+  "custom_script": "echo 'THIS IS CUSTUM SCRIPT'",
   "Network" : [{
     "Ip": "192.168.2.254/24",
     "Netmask": "255.255.255.0",
@@ -266,6 +281,7 @@ rout3 = (3,{
   "Type": "Router",
   "Ram": "1024",
   "Os": "bento/ubuntu-16.04",
+  "custom_script": "echo 'THIS IS CUSTUM SCRIPT'",
   "Network" : [{
     "Ip": "192.168.3.254/24",
     "Netmask": "255.255.255.0",
@@ -282,14 +298,6 @@ rout3 = (3,{
 })
 
 MyNet = [host1,host2,host3,rout1,rout2,rout3]
-
-def find_between( s, first, last ):
-    try:
-        start = s.index( first ) + len( first )
-        end = s.index( last, start )
-        return s[start:end]
-    except ValueError:
-        return ""
 
 def remap(newList):
     print("-------------------")
@@ -334,7 +342,7 @@ def remap(newList):
 
     return MyNet
 
-def html_to_vagrantfile(Network):
+def html_to_vagrantfile(listOfDevice):
     VagrantFile = open("VagrantfileOSPF", "w")
 
     #read the data structure from input
@@ -347,7 +355,9 @@ def html_to_vagrantfile(Network):
       #print(listOfDevice)
       #listOfDevice = yaml.load(listOfDevice) 
 
-    #Network = remap(listOfDevice)
+
+    Network = remap(listOfDevice)
+    #Network = listOfDevice
     #N.B per Luca, Network è già la lista dei nodi che puoi esplorare
 
     #first, let's write the beginnig of the VagrantFile
@@ -376,5 +386,4 @@ def html_to_vagrantfile(Network):
     VagrantFile.write("end\n")
     VagrantFile.close()
 
-
-main()
+#html_to_vagrantfile(MyNet)

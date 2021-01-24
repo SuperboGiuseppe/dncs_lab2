@@ -1,5 +1,4 @@
-import ipcalc 
-import codecs
+import ipcalc
 import yaml
 
 #this function writes the beginning of the VagrantFile
@@ -7,6 +6,7 @@ def BeginVagrantFile(f,Docker):
 
     Name = Docker[1]["Name"]
     Os  = Docker[1]["Os"]
+    CustumScript = Router[1]["custom_script"]
 
     f.write('## to access webserver try this in your webbrowser : (http://localhost:8081/) you will see the webpage.\n')
     f.write('# -*- mode: ruby -*-\n')
@@ -20,13 +20,19 @@ def BeginVagrantFile(f,Docker):
     f.write('doc.pull_images "mysql"\n')
     f.write('doc.run "mysql"\n')
     f.write('doc.run "nginx", args: "-p 80:80"\n')
+
+    f.write(Name + '.vm.provision "shell", run: "always", inline: <<-SHELL\n')
+    #here there is the custum script
+    f.write(CustumScript + " \n")
+
     f.write('end\n')
     f.write('end\n')
 
 docker1 = (1,{
   "Id" : 1,
   "Name":"docker1",
-  "Os": "ubuntu/xenial64"
+  "Os": "ubuntu/xenial64",
+  "custom_script":"echo 'THIS IS CUSTUM SCRIPT'"
 })
 
 MyNet = [docker1]
@@ -104,5 +110,3 @@ def html_to_vagrantfile(Network):
 
     VagrantFile.close()
 
-
-main()

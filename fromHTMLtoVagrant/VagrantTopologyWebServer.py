@@ -1,5 +1,4 @@
 import ipcalc 
-import codecs
 import yaml
 
 #this function writes the beginning of the VagrantFile
@@ -18,6 +17,7 @@ def writeWebServer(f,Web):
     Name = Web[1]["Name"]
     Os  = Web[1]["Os"]
     Ip = Web[1]["Ip"]
+    CustumScript = Web[1]["custom_script"]
 
     f.write('config.vm.define \"' + Name + '\" do |' + Name + '|\n')
     f.write(Name + '.vm.box = \"' + Os + '\"\n')
@@ -29,6 +29,11 @@ def writeWebServer(f,Web):
     f.write('sudo apt-get install -y nginx\n')
     f.write('touch /var/www/html/index.php\n')
     f.write('sudo apt-get install -y php-fpm php-mysql\n')
+
+
+    #here there is the custum script
+    f.write(CustumScript + " \n")
+
     f.write('echo "Provision web server complete"\n')
     f.write('SHELL\n')
     f.write('end\n')
@@ -41,12 +46,18 @@ def writeDatabase(f,Db):
     Name = Db[1]["Name"]
     Os  = Db[1]["Os"]
     Ip = Db[1]["Ip"]
+    CustumScript = Db[1]["custom_script"]
 
     f.write('# Configure database server machine\n')
     f.write('config.vm.define \"' + Name + '\" do |' + Name + '|\n')
     f.write(Name + '.vm.box = \"' + Os + '\"\n')
     f.write(Name + '.vm.hostname = "' + Name + '"\n')
     f.write(Name + '.vm.network "private_network", ip: \"' + Ip + '\" \n')
+
+    f.write(Name + '.vm.provision "shell", run: "always", inline: <<-SHELL\n')
+    #here there is the custum script
+    f.write(CustumScript + " \n")
+
     f.write('end\n')
     f.write('end\n')
 
@@ -55,14 +66,16 @@ web1 = (1,{
   "Id" : 1,
   "Name":"web1",
   "Os": "ubuntu/xenial64",
-  "Ip": "10.0.0.50"
+  "Ip": "10.0.0.50",
+  "custom_script":"echo 'THIS IS CUSTUM SCRIPT'"
 })
 
 db1 = (2,{
   "Id" : 2,
   "Name":"db1",
   "Os": "ubuntu/xenial64",
-  "Ip": "10.0.0.51"
+  "Ip": "10.0.0.51",
+  "custom_script":"echo 'THIS IS CUSTUM SCRIPT'"
 })
 
 
@@ -143,5 +156,3 @@ def html_to_vagrantfile(Network):
 
     VagrantFile.close()
 
-
-main()

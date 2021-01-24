@@ -28,6 +28,7 @@ def writeHost(f,Host,Topology):
     Name = Host[1]["Name"]
     Os  = Host[1]["Os"]
     Ram = Host[1]["Ram"]
+    CustumScript = Host[1]["custom_script"]
 
     Ip = Host[1]["Network"][0]["Ip"]
     Netmask = Host[1]["Network"][0]["Netmask"]
@@ -132,6 +133,7 @@ def writeRouter(f,Router,Topology):
     Name = Router[1]["Name"]
     Ram = Router[1]["Ram"]
     Os  = Router[1]["Os"]
+    CustumScript = Router[1]["custom_script"]
 
     Ip1 = Router[1]["Network"][0]["Ip"]
     Netmask1 = Router[1]["Network"][0]["Netmask"]
@@ -216,6 +218,7 @@ def writeSwitch(f,Switch,Topology):
     Name = Switch[1]["Name"]
     Ram = Switch[1]["Ram"]
     Os  = Switch[1]["Os"]
+    CustumScript = Switch[1]["custom_script"]
 
     IpA = Switch[1]["Network"][0]["Ip"]
     NetmaskA = Switch[1]["Network"][0]["Netmask"]
@@ -302,6 +305,7 @@ host1 = (1,{
   "Type": "Host",
   "Ram": "1024",
   "Os": "bento/ubuntu-16.04",
+  "custom_script":"echo 'THIS IS CUSTUM SCRIPT'",
   "Network" : [{
     "Ip": "172.16.8.5/22",
     "Netmask": "255.255.252.0",
@@ -314,6 +318,7 @@ host2 = (2,{
   "Type": "Host",
   "Ram": "1024",
   "Os": "bento/ubuntu-16.04",
+  "custom_script":"echo 'THIS IS CUSTUM SCRIPT'",
   "Network" : [{
     "Ip": "172.16.12.5/22",
     "Netmask": "255.255.252.0",
@@ -326,6 +331,7 @@ host3 = (3,{
   "Type": "Host",
   "Ram": "1024",
   "Os": "bento/ubuntu-16.04",
+  "custom_script":"echo 'THIS IS CUSTUM SCRIPT'",
   "Network" : [{
     "Ip": "172.16.2.5/24",
     "Netmask": "255.255.255.0",
@@ -339,6 +345,7 @@ rout1 = (4,{
   "Type": "Router",
   "Ram": "1024",
   "Os": "bento/ubuntu-16.04",
+  "custom_script":"echo 'THIS IS CUSTUM SCRIPT'",
   "Network" : [{
     "Ip": "172.16.3.5/28",
     "Netmask": "255.255.255.240",
@@ -355,6 +362,7 @@ rout2 = (5,{
   "Type": "Router",
   "Ram": "1024",
   "Os": "bento/ubuntu-16.04",
+  "custom_script":"echo 'THIS IS CUSTUM SCRIPT'",
   "Network" : [{
     "Ip": "172.16.2.10/24",
     "Netmask": "255.255.255.0",
@@ -371,6 +379,7 @@ switch1 = (6,{
   "Type": "Switch",
   "Ram": "1024",
   "Os": "bento/ubuntu-16.04",
+  "custom_script":"echo 'THIS IS CUSTUM SCRIPT'",
   "Network" : [{
     "Ip": "172.16.8.10/22",
     "Netmask": "255.255.252.0",
@@ -393,7 +402,8 @@ def html_to_vagrantfile(Network):
 
     #read the data structure from input
     #Network = G.nodes.data():
-    Network = fakeNet
+    #Network = fakeNet
+    #N.B per Luca, Network è già la lista dei nodi che puoi esplorare
 
     #first, let's write the beginnig of the VagrantFile
     BeginVagrantFile(VagrantFile,Network)
@@ -427,4 +437,4 @@ def html_to_vagrantfile(Network):
     VagrantFile.write("end\n")
     VagrantFile.close()
 
-main()
+
