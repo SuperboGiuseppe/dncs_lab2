@@ -54,6 +54,7 @@ class network_design_window(QtWidgets.QMainWindow):
         self.current_network = network_core.create_network()
         self.current_network_name = ""
         self.current_network_path = ""
+        self.current_network_template = ""
         self.current_network_deployed = 0
         self.resize(1024, 768)
         self.center()
@@ -234,13 +235,14 @@ class network_design_window(QtWidgets.QMainWindow):
                 - self: current instance of the class.
         """
         file_path = QtWidgets.QFileDialog.getOpenFileName(self, 'OpenFile')
-        self.current_network = network_core.open_network(file_path[0])
-        self.update_canvas_html(os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html"))
-        self.current_network_path = os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html")
-        self.editor_window = editor_components(self)
-        self.dashboard_window = dashboard_vms(self)
-        self.edge_window = edge_editors(self)
-        self.enable_buttons_editing()
+        if(len(file_path) > 2):
+            self.current_network = network_core.open_network(file_path[0])
+            self.update_canvas_html(os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html"))
+            self.current_network_path = os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html")
+            self.editor_window = editor_components(self)
+            self.dashboard_window = dashboard_vms(self)
+            self.edge_window = edge_editors(self)
+            self.enable_buttons_editing()
         
     
     def save_file_window(self):
@@ -264,10 +266,13 @@ class network_design_window(QtWidgets.QMainWindow):
         self.debug_console_frame.hide()
 
     def vagrant_execution(self):
-        os.mkdir("Test")
-        os.chdir("./Test")
-        vagrantConverterCollector.converter_selector(self.current_network_path, "OSPF")
-        self.debug_console_textedit.clear()
+        os.chdir("./NetworkGraphs")
+        os.mkdir(self.current_network_name)
+        os.chdir("./" + self.current_network_name)
+        print("./" + self.current_network_name)
+        print(self.current_network_template)
+        vagrantConverterCollector.converter_selector(self.current_network_path, self.current_network_template)
+        #self.debug_console_textedit.clear()
         #self.vagrant_process.start('vagrant up')
 
     
@@ -434,9 +439,10 @@ class new_network_wizard(QtWidgets.QWizard):
 
         """
         if self.currentId() == self.template_id:
-            #print(self.templates_directory_path + "\\" + self.template_page.field("network_path"))
-            self.main_window_object.current_network = network_core.open_network(self.templates_directory_path + "\\" + self.template_page.field("network_path"))
-            self.main_window_object.current_network_name = self.template_page.field("network_path")
+            template_path = self.templates_directory_path + "\\" + self.template_page.field("network_path")
+            self.main_window_object.current_network_template = template_path.split("\\")[len(template_path.split("\\"))-1].split("_")[0]
+            self.main_window_object.current_network = network_core.open_network(template_path)
+            self.main_window_object.current_network_name = self.template_page.field("network_name")
             self.main_window_object.update_canvas_html(os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html"))
             self.main_window_object.current_network_path = os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html")
             self.main_window_object.editor_window = editor_components(self.main_window_object)
@@ -564,6 +570,7 @@ class editor_components(QtWidgets.QMainWindow):
         self.button_save = QtWidgets.QPushButton("Save")
         self.button_save.clicked.connect(self.on_save)
         self.button_cancel = QtWidgets.QPushButton("Cancel")
+        self.button_cancel.clicked.connect(self.on_cancel)
         self.button_layout.addWidget(self.button_save)
         self.button_layout.addWidget(self.button_cancel)
         self.button_frame.setLayout(self.button_layout)
@@ -761,6 +768,9 @@ class editor_components(QtWidgets.QMainWindow):
         G.save_graph("./NetworkGraphs/Temp_Network/temp_network.html")
         network_core.html_fix(os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html"))
         self.main_window_object.update_canvas_html(os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html"))
+        self.close()
+    
+    def on_cancel(self):
         self.close()
 
 

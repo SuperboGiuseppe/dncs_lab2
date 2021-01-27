@@ -18,13 +18,15 @@ def extract_nodes(network_path):
     if "nodes = new vis.DataSet(" in html:
       listOfDevice = find_between(html, "nodes = new vis.DataSet(" , ")")
       print(listOfDevice)
-      listOfDevice = yaml.load(listOfDevice) 
+      listOfDevice = yaml.safe_load(listOfDevice) 
 
     return listOfDevice
 
 def converter_selector(network_path, template):
     network = extract_nodes(network_path)
+    print(template)
     if(template == "OSPF"):
+        print("Test_OSPF")
         VagrantTopologyOSPF.html_to_vagrantfile(network)
     if(template == "Docker"):
         VagrantTopologyDocker.html_to_vagrantfile(network)
