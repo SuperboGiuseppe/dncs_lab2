@@ -120,10 +120,10 @@ Some prerequisites have to be done before using this environment. It's based on 
 
 ### Installation Rrequirements
 
-1. Python3
+1. [Python](https://www.python.org/)
 2. 10GB disk storage
 3. Windows/Linux/Mac
-4. Virtualbox
+4. [VirtualBox](https://www.virtualbox.org/)
 5. [Vagrant](https://www.vagrantup.com/)
 6. Internet
 7. Clone the repo
