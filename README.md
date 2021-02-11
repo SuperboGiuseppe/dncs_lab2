@@ -27,7 +27,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/SuperboGiuseppe/dncs_lab2">
-    <img src="Images/logo1.png" alt="Logo" width="80" height="80">
+    <img src="Images/network.png" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">AUTOMATING THE DEPLOYMENT OF NETWORK SETUPS USING VAGRANT</h3>
@@ -79,7 +79,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+![Main window screenshot][product-screenshot]
 
 The purpose of this project is to provide a fully automated virtual network environment. Where a user can easily customize and design a virtual network environment according to their need. With the help of this environment, a user can create different virtual machines acting as a server, router, switches, and hosts. Using this setup users can easily control and monitor their machines' performances and they can use them accordingly.
 
@@ -91,6 +91,7 @@ A network is composed of a set of computing devices connected to each other. Lik
 
 * [Pyvis](https://pyvis.readthedocs.io/en/latest/tutorial.html)
 * [Vagrant](https://www.vagrantup.com/)
+* [QtPy](https://pypi.org/project/PyQt5/)
 * [Vagrant Boxes](https://app.vagrantup.com/boxes/search)
 * [Python](https://www.python.org/)
 * [VirtualBox](https://www.virtualbox.org/)

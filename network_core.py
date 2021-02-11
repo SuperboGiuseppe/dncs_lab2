@@ -93,7 +93,10 @@ def nodes_search_type(network, search_type):
     nodes = network.nodes
     result = []
     for node in nodes:
-        if node["type"] == search_type:
+        if search_type == "others":
+            if node["type"] not in ["router", "host", "switch"]:
+                result.append(node)
+        elif node["type"] == search_type:
             result.append(node)
     return result
     
