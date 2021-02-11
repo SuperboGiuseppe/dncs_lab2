@@ -121,12 +121,13 @@ Some prerequisites have to be done before using this environment. It's based on 
 
 ### Installation Rrequirements
 
-1. Python3
+1. [Python](https://www.python.org/)
 2. 10GB disk storage
-3. Virtualbox
-4. [Vagrant](https://www.vagrantup.com/)
-5. Internet
-6. Clone the repo
+3. Windows/Linux/Mac
+4. [VirtualBox](https://www.virtualbox.org/)
+5. [Vagrant](https://www.vagrantup.com/)
+6. Internet
+7. Clone the repo
    ```sh
    git clone https://github.com/SuperboGiuseppe/dncs_lab2.git
    ```
