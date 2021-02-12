@@ -1,4 +1,5 @@
 import socket
+import psutil #this import was added by luca
 
 HEADER = 64
 PORT = 5050
@@ -18,6 +19,15 @@ def send(msg):
     client.send(send_length)
     client.send(message)
     print(client.recv(2048).decode(FORMAT))
+
+#this function return the percentage of RAM in use by the machine
+def Ram_data_perc():
+    return (psutil.virtual_memory().available * 100 / psutil.virtual_memory().total)
+
+#this function return the percentage of CPU in use by the machine
+def Cpu_data_perc():
+    return (psutil.cpu_percent())    
+
 
 send("Hello World!")
 input()

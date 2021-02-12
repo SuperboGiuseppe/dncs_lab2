@@ -81,6 +81,7 @@ def writeHost(f,Host,Topology):
       f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub + "\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_host_" + Name + "\", auto_config: true\n")
     if Id is 3:
       f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub + "\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_router-south-2\", auto_config: true\n") 
+    
     f.write("#.vm.provision \"shell\", inline: <<-SHELL\n")
     f.write("#echo \"Installation of Lynx Text-Based Browser to access the Web-Server via terminal on " + Name + "\"\n")
     f.write("#sudo apt-get update\n")
@@ -105,6 +106,9 @@ def writeHost(f,Host,Topology):
       f.write("sudo route add -net " + IpNet8 + " netmask " + Mask8 + " gw " + Gateway + " dev " + Interface + "\n")
       f.write("sudo route add -net " + IpNet12 + " netmask " + Mask12 + " gw " + Gateway + " dev " + Interface + "\n")
     
+    #here there is the custum script
+    f.write(CustumScript + " \n")  
+
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write("SHELL\n")
@@ -202,7 +206,9 @@ def writeRouter(f,Router,Topology):
       f.write("sudo route add -net " + IpNet8 + " netmask " + Mask8 + " gw " + GatewayRouter1 + " dev " + Interface2 + "\n")
       f.write("sudo route add -net " + IpNet12 + " netmask " + Mask12 + " gw " + GatewayRouter1 + " dev " + Interface2 + "\n")
 
-    
+    #here there is the custum script
+    f.write(CustumScript + " \n")
+
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write("SHELL\n")
@@ -281,6 +287,10 @@ def writeSwitch(f,Switch,Topology):
     f.write("sudo sysctl -w net.ipv4.ip_forward=1\n")
     f.write("sudo route add -net " + IpNet2 +" netmask " + Mask2 + " gw " + Gateway + " dev " + InterfaceSW + "\n")
     f.write("sudo route add -net " + IpNet4 +" netmask " + Mask4 + " gw " + Gateway + " dev " + InterfaceSW + "\n")
+
+    #here there is the custum script
+    f.write(CustumScript + " \n")
+
     f.write("echo \"Configuration END\"\n")
     f.write("echo \""+ Name + " is ready to Use\"\n")
     f.write("SHELL\n")
