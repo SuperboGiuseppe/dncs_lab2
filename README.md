@@ -56,13 +56,14 @@
       <a href="#about-the-project">About The Project</a>
       <ul>
         <li><a href="#built-with">Built With</a></li>
+        <li><a href="#List-of-features">List of features</a></li>
       </ul>
     </li>
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
+        <li><a href="#installation-Requirements">Installation Requirements</a></li>
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
@@ -121,7 +122,7 @@ Some prerequisites have to be done before using this environment. It's based on 
   ``
 -->
 
-### Installation Rrequirements
+### Installation Requirements
 
 1. [Python](https://www.python.org/)
 2. 10GB disk storage
