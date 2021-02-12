@@ -81,11 +81,15 @@
 
 ![Main window screenshot][product-screenshot]
 
-The purpose of this project is to provide a useful tool from which it is possible to create fully automated virtual network environment. Here the user can easily customize and design a virtual network environment according to their needs. With the help of this tool, a user can create and configure different virtual machines acting as a server, router, switches, and hosts or specialized hosts. Custom topologies can be designed from scratch or starting from predefined templates. Once the network is deployed and configured, the user can access or monitor each machine.
+This project is based on a graphical user interface (GUI) that provides a platform for the developer to create a fully automated virtual network environment for testing and development. The users can easily customize and design a virtual network environment according to their needs. With the help of this platform, a user can create and configure different virtual machines acting as a server, router, switches, and hosts or specialized hosts. Custom topologies can be designed from scratch or starting from predefined templates. Once the network is deployed and configured, the user can access or monitor each virtual machine.
 
 ### List of features
 Available features:
-- Other detail is pending......
+- Provide Graphical User Interface for creating Virtual environments.
+- Provide the functionality to use different Linux machine's flavors for different purposes.
+- Provide the option to control your network in real-time.
+- Provide the option to write and debug the vagrant scripts.
+- Provide also the option of customizing the network topologies.
 
 ### Built With
 
