@@ -78,7 +78,7 @@ def dictionary_to_edges(dictionary, network):
 
     """
     for edge in dictionary:
-        network.add_edge(edge["from"],edge["to"], bandwidth=edge["bandwidth"])
+        network.add_edge(edge["from"],edge["to"], bandwidth_up=edge["bandwidth_up"], bandwidth_down=edge["bandwidth_down"])
 
 def nodes_search_type(network, search_type):
     """Function that returns only a specific type of nodes of a network

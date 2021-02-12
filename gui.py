@@ -447,6 +447,7 @@ class new_network_wizard(QtWidgets.QWizard):
             self.main_window_object.current_network_path = os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html")
             self.main_window_object.editor_window = editor_components(self.main_window_object)
             self.main_window_object.dashboard_window = dashboard_vms(self.main_window_object)
+            self.main_window_object.edge_window = edge_editors(self.main_window_object)
             self.main_window_object.enable_buttons_editing()
         else:
             print(self.scratch_page.field("network_name_scratch"))
@@ -711,7 +712,7 @@ class editor_components(QtWidgets.QMainWindow):
         network_column_count = len(devices[index]["network_interfaces"][0])
             
         for row in range(network_row_count):
-            for column in range(network_column_count):
+            for column in range(network_column_count-1):
                 item = (list(devices[index]["network_interfaces"][row].values())[column])
                 table.setItem(row, column, QtWidgets.QTableWidgetItem(item))
     
@@ -788,12 +789,16 @@ class edge_editors(QtWidgets.QMainWindow):
         self.resize(512, 280)
         self.window_layout = QtWidgets.QGridLayout(self)
         self.edge_combobox = QtWidgets.QComboBox()
-        self.edge_combobox.activated[str].connect(lambda: self.bandwidth_textbox.setText(str(self.edges[self.edge_combobox.currentIndex()]["bandwidth"])))
+        self.edge_combobox.activated[str].connect(lambda: self.bandwidth_up_textbox.setText(str(self.edges[self.edge_combobox.currentIndex()]["bandwidth_up"])))
+        self.edge_combobox.activated[str].connect(lambda: self.bandwidth_down_textbox.setText(str(self.edges[self.edge_combobox.currentIndex()]["bandwidth_down"])))
         self.collect_edges()
-        self.bandwidth_textbox = QtWidgets.QLineEdit()
-        self.bandwidth_textbox.textChanged[str].connect(lambda: (self.bandwidth_changes(self.edges, self.edge_combobox.currentIndex(), self.bandwidth_textbox.text())))
+        self.bandwidth_up_textbox = QtWidgets.QLineEdit()
+        self.bandwidth_up_textbox.textChanged[str].connect(lambda: (self.bandwidth_changes(self.edges, self.edge_combobox.currentIndex(), "bandwidth_up" , self.bandwidth_up_textbox.text())))
+        self.bandwidth_down_textbox = QtWidgets.QLineEdit()
+        self.bandwidth_down_textbox.textChanged[str].connect(lambda: (self.bandwidth_changes(self.edges, self.edge_combobox.currentIndex(), "bandwidth_down",self.bandwidth_down_textbox.text())))
         if len(self.edges) > 0:
-            self.bandwidth_textbox.setText(str(self.edges[self.edge_combobox.currentIndex()]["bandwidth"]))
+            self.bandwidth_up_textbox.setText(str(self.edges[self.edge_combobox.currentIndex()]["bandwidth_up"]))
+            self.bandwidth_down_textbox.setText(str(self.edges[self.edge_combobox.currentIndex()]["bandwidth_down"]))
         self.button_frame = QtWidgets.QWidget()
         self.button_layout = QtWidgets.QHBoxLayout()
         self.button_layout.setAlignment(QtCore.Qt.AlignRight)
@@ -806,10 +811,12 @@ class edge_editors(QtWidgets.QMainWindow):
         self.button_frame.setLayout(self.button_layout)
         self.window_layout.addWidget(QtWidgets.QLabel("Select the edge:"), 0, 0)
         self.window_layout.addWidget(self.edge_combobox, 1, 0, 1, 2)
-        self.window_layout.addWidget(QtWidgets.QLabel("Bandwidth (Mbps):"), 2, 0)
-        self.window_layout.addWidget(self.bandwidth_textbox, 2,1)
-        self.window_layout.addItem(QtWidgets.QSpacerItem(400, 220), 3, 0, 1, 2)
-        self.window_layout.addWidget(self.button_frame, 4, 0, 1, 2)
+        self.window_layout.addWidget(QtWidgets.QLabel("Bandwidth uplink (Mbps):"), 2, 0)
+        self.window_layout.addWidget(self.bandwidth_up_textbox, 2,1)
+        self.window_layout.addWidget(QtWidgets.QLabel("Bandwidth downlink (Mbps):"), 3, 0)
+        self.window_layout.addWidget(self.bandwidth_down_textbox, 3,1)
+        self.window_layout.addItem(QtWidgets.QSpacerItem(400, 220), 4, 0, 1, 2)
+        self.window_layout.addWidget(self.button_frame, 5, 0, 1, 2)
         self.window = QtWidgets.QWidget()
         self.window.setLayout(self.window_layout)
         self.setCentralWidget(self.window)
@@ -818,14 +825,15 @@ class edge_editors(QtWidgets.QMainWindow):
     def collect_edges(self):
         self.edges = self.temporary_network.edges
         self.devices = self.temporary_network.nodes
+        print(self.edges)
         for edge in self.edges:
             self.edge_combobox.addItem(self.devices[edge["from"]-1]["label"] + " <----> " + self.devices[edge["to"]-1]["label"])
     
-    def bandwidth_changes(self, edges, index, new_value):
+    def bandwidth_changes(self, edges, index, direction, new_value):
             if new_value == "":
-                edges[index]["bandwidth"] = 0
+                edges[index][direction] = 0
             else:
-                edges[index]["bandwidth"] = int(new_value)
+                edges[index][direction] = int(new_value)
 
     def on_save(self):
         """Method called when the user presses the save button in the editor configuration. It applies the changes in the temporary network and updates the network graph of the canvas.

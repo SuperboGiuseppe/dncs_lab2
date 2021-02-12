@@ -81,8 +81,10 @@
 
 ![Main window screenshot][product-screenshot]
 
-The purpose of this project is to provide a fully automated virtual network environment. Where a user can easily customize and design a virtual network environment according to their need. With the help of this environment, a user can create different virtual machines acting as a server, router, switches, and hosts. Using this setup users can easily control and monitor their machines' performances and they can use them accordingly.
+The purpose of this project is to provide a useful tool from which it is possible to create fully automated virtual network environment. Here the user can easily customize and design a virtual network environment according to their needs. With the help of this tool, a user can create and configure different virtual machines acting as a server, router, switches, and hosts or specialized hosts. Custom topologies can be designed from scratch or starting from predefined templates. Once the network is deployed and configured, the user can access or monitor each machine.
 
+### List of features
+Available features:
 - Other detail is pending......
 
 ### Built With
