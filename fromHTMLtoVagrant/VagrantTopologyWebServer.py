@@ -11,13 +11,22 @@ def BeginVagrantFile(f):
     f.write('# Configure web server machine\n')
 
 
-def writeWebServer(f,Web):
+def writeWebServer(f,Web, edges):
 
-    Id = Web[1]["Id"]
-    Name = Web[1]["Name"]
-    Os  = Web[1]["Os"]
-    Ip = Web[1]["Ip"]
-    CustumScript = Web[1]["custom_script"]
+    Id = Web["id"]
+    Name = Web["label"]
+    Os  = Web["vm_image"]
+    Ip = Web["network_interfaces"][0]["ip_address"]
+    InterfaceName = Web["network_interfaces"][0]["name_interface"]
+    EdgeReference = Web["network_interfaces"][0]["edge"]
+    UplinkBandwidth = 0
+    DownlinkBandwidth = 0
+    for edge in edges:
+      if EdgeReference[0] == edge["from"] and EdgeReference[1] == edge["to"]:
+        UplinkBandwidth = edge["bandwidth_up"]
+        DownlinkBandwidth = edge["bandwidth_down"]
+    CustumScript = Web["custom_script"]
+    
 
     f.write('config.vm.define \"' + Name + '\" do |' + Name + '|\n')
     f.write(Name + '.vm.box = \"' + Os + '\"\n')
@@ -29,8 +38,17 @@ def writeWebServer(f,Web):
     f.write('sudo apt-get install -y nginx\n')
     f.write('touch /var/www/html/index.php\n')
     f.write('sudo apt-get install -y php-fpm php-mysql\n')
-
-
+    f.write('sudo apt install wondershaper \n')
+    f.write('sudo systemctl enable wondershaper.service \n')
+    f.write('sudo systemctl start wondershaper.service \n')
+    for edge in edges:
+      if UplinkBandwidth > 0 or DownlinkBandwidth > 0:
+        f.write('sudo wondershaper -a ' + InterfaceName)
+        if DownlinkBandwidth > 0:
+          f.write(' -d ' + str(DownlinkBandwidth))
+        if UplinkBandwidth > 0:
+          f.write(' -u ' + str(UplinkBandwidth))
+        f.write('\n')
     #here there is the custum script
     f.write(CustumScript + " \n")
 
@@ -40,13 +58,21 @@ def writeWebServer(f,Web):
 
 
 
-def writeDatabase(f,Db):
+def writeDatabase(f,Db, edges):
 
-    Id = Db[1]["Id"]
-    Name = Db[1]["Name"]
-    Os  = Db[1]["Os"]
-    Ip = Db[1]["Ip"]
-    CustumScript = Db[1]["custom_script"]
+    Id = Db["id"]
+    Name = Db["label"]
+    Os  = Db["vm_image"]
+    Ip = Db["network_interfaces"][0]["ip_address"]
+    InterfaceName = Db["network_interfaces"][0]["name_interface"]
+    EdgeReference = Db["network_interfaces"][0]["edge"]
+    UplinkBandwidth = 0
+    DownlinkBandwidth = 0
+    for edge in edges:
+      if EdgeReference[0] == edge["from"] and EdgeReference[1] == edge["to"]:
+        UplinkBandwidth = edge["bandwidth_up"]
+        DownlinkBandwidth = edge["bandwidth_down"]
+    CustumScript = Db["custom_script"]
 
     f.write('# Configure database server machine\n')
     f.write('config.vm.define \"' + Name + '\" do |' + Name + '|\n')
@@ -55,13 +81,26 @@ def writeDatabase(f,Db):
     f.write(Name + '.vm.network "private_network", ip: \"' + Ip + '\" \n')
 
     f.write(Name + '.vm.provision "shell", run: "always", inline: <<-SHELL\n')
+    f.write('sudo apt update')
+    f.write('sudo apt install mysql-server \n')
+    f.write('sudo apt install wondershaper \n')
+    f.write('sudo systemctl enable wondershaper.service \n')
+    f.write('sudo systemctl start wondershaper.service \n')
+    for edge in edges:
+      if UplinkBandwidth > 0 or DownlinkBandwidth > 0:
+        f.write('sudo wondershaper -a ' + InterfaceName)
+        if DownlinkBandwidth > 0:
+          f.write(' -d ' + str(DownlinkBandwidth))
+        if UplinkBandwidth > 0:
+          f.write(' -u ' + str(UplinkBandwidth))
+        f.write('\n')
     #here there is the custum script
     f.write(CustumScript + " \n")
-
+    f.write('SHELL\n')
     f.write('end\n')
     f.write('end\n')
 
-
+"""
 web1 = (1,{
   "Id" : 1,
   "Name":"web1",
@@ -81,6 +120,8 @@ db1 = (2,{
 
 MyNet = [web1,db1]
 
+
+
 def find_between( s, first, last ):
     try:
         start = s.index( first ) + len( first )
@@ -95,7 +136,20 @@ def remap(newList):
     for item in newList:
       print("Looking at device " + str(item))
       print("the TYPE is " + item["type"])
-      if item["type"] == "router" : 
+
+      print("remap of device " + str(device[1]["Id"] + " to device " + str(item["id"])))
+      device[1]["Name"] = item["label"]
+      device[1]["Ram"] = item["ram"]
+      device[1]["Os"] = item["vm_image"]
+      device[1]["N_Cpus"] = item["n_cpus"]
+
+      device[1]["Network"][0]["Ip"] = item["network_interfaces"][0]["ip_address"]
+      device[1]["Network"][0]["Netmask"] = item["network_interfaces"][0]["netmask"]
+      device[1]["Network"][0]["Interface"] = item["network_interfaces"][0]["name_interface"]
+      #device[1]["Network"][0]["Uplink_bandwidth"] = 
+
+
+      if item["type"] == "web" : 
 
         for device in MyNet:
           if device[1]["Id"] is item["id"]:
@@ -117,7 +171,7 @@ def remap(newList):
             device[1]["Network"][2]["Interface"] = item["network_interfaces"][2]["name_interface"]        
 
     for item in newList:
-      if item["type"] == "host" : 
+      if item["type"] == "db" : 
 
         for device in MyNet:
            if device[1]["Id"] is item["id"]:
@@ -131,8 +185,9 @@ def remap(newList):
              device[1]["Network"][0]["Interface"] = item["network_interfaces"][0]["name_interface"]
 
     return MyNet
+"""
 
-def html_to_vagrantfile(Network):
+def html_to_vagrantfile(nodes, edges):
     VagrantFile = open("VagrantfileWEBSERVER", "w")
 
     #read the data structure from input
@@ -151,8 +206,11 @@ def html_to_vagrantfile(Network):
     #N.B per Luca, Network è già la lista dei nodi che puoi esplorare
 
     BeginVagrantFile(VagrantFile)
-    writeWebServer(VagrantFile,web1)
-    writeDatabase(VagrantFile,db1)
-
+    for node in nodes:
+      if node["type"] == "web":
+        writeWebServer(VagrantFile, node, edges)
+      if node["type"] == "db":
+        writeDatabase(VagrantFile, node, edges)
+    
     VagrantFile.close()
 

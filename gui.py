@@ -56,7 +56,7 @@ class network_design_window(QtWidgets.QMainWindow):
         self.current_network_path = ""
         self.current_network_template = ""
         self.current_network_deployed = 0
-        self.resize(1024, 768)
+        self.resize(1174, 768)
         self.center()
         self.setWindowTitle("Virtual Network automated deployment via Vagrant")
         self.main_toolbar()
@@ -119,6 +119,12 @@ class network_design_window(QtWidgets.QMainWindow):
         self.button_host.setIconText("Host")
         self.button_host.setDisabled(True)
 
+        self.button_other = QtWidgets.QAction(QtGui.QIcon("./Images/webserver.png"), "Label", self)
+        self.button_other.setStatusTip("Add an other tipology of device to the network")
+        self.button_other.setToolTip("Add an other tipology of device to the network")
+        self.button_other.setIconText("Other")
+        self.button_other.setDisabled(True)
+
         self.button_editor = QtWidgets.QAction(QtGui.QIcon("./Images/tool.png"), "Label", self)
         self.button_editor.setStatusTip("Edit virtual network devices")
         self.button_editor.setToolTip("Edit virtual network devices")
@@ -172,6 +178,11 @@ class network_design_window(QtWidgets.QMainWindow):
         self.button_terminal.setIconText("Debug console")
         self.button_terminal.triggered.connect(lambda: self.debug_console_frame.setVisible(False) if self.debug_console_frame.isVisible() else self.debug_console_frame.setVisible(True))
            
+        self.button_destroy = QtWidgets.QAction(QtGui.QIcon("./Images/bin.png"), "Label", self)
+        self.button_destroy.setStatusTip("Destroy the current deployed virtual machines")
+        self.button_destroy.setToolTip("Destroy the current deployed virtual machines")
+        self.button_destroy.setIconText("Destroy network")
+        self.button_destroy.setDisabled(True)
         
         self.main_toolbar.addAction(self.button_new)
         self.main_toolbar.addAction(self.button_save)
@@ -180,12 +191,14 @@ class network_design_window(QtWidgets.QMainWindow):
         self.main_toolbar.addAction(self.button_router)
         self.main_toolbar.addAction(self.button_switch)
         self.main_toolbar.addAction(self.button_host)
+        self.main_toolbar.addAction(self.button_other)
         self.main_toolbar.addAction(self.button_editor)
         self.main_toolbar.addAction(self.button_edge)
         self.main_toolbar.addSeparator()
         self.main_toolbar.addAction(self.button_vagrant)
         self.main_toolbar.addAction(self.button_dashboard)
         self.main_toolbar.addAction(self.button_terminal)
+        self.main_toolbar.addAction(self.button_destroy)
 
 
     def statusbar(self):

@@ -11,28 +11,32 @@ def find_between( s, first, last ):
     except ValueError:
         return ""
 
-def extract_nodes(network_path):
+def extract_network(network_path):
     file = codecs.open(network_path, "r", "utf-8")
     html = file.read()
 
     if "nodes = new vis.DataSet(" in html:
-      listOfDevice = find_between(html, "nodes = new vis.DataSet(" , ")")
-      print(listOfDevice)
-      listOfDevice = yaml.safe_load(listOfDevice) 
+        nodes = yaml.safe_load(find_between(html, "nodes = new vis.DataSet(" , ")"))
+        print(nodes)
 
-    return listOfDevice
+
+    if "edges = new vis.DataSet(" in html:
+        edges = yaml.safe_load(find_between(html, "edges = new vis.DataSet(", ")"))
+        print(edges)
+
+    return nodes, edges
+
+
 
 def converter_selector(network_path, template):
-    network = extract_nodes(network_path)
-    print(template)
+    nodes, edges = extract_network(network_path)
     if(template == "OSPF"):
-        print("Test_OSPF")
-        VagrantTopologyOSPF.html_to_vagrantfile(network)
+        VagrantTopologyOSPF.html_to_vagrantfile(nodes, edges)
     if(template == "Docker"):
-        VagrantTopologyDocker.html_to_vagrantfile(network)
+        VagrantTopologyDocker.html_to_vagrantfile(nodes, edges)
     if(template == "MySQL"):
-        VagrantTopologyMySQL.html_to_vagrantfile(network)
+        VagrantTopologyMySQL.html_to_vagrantfile(nodes, edges)
     if(template == "Switch"):
-        VagrantTopologySwitch.html_to_vagrantfile(network)
+        VagrantTopologySwitch.html_to_vagrantfile(nodes, edges)
     if(template == "WebServer"):
-        VagrantTopologyWebServer.html_to_vagrantfile(network)
+        VagrantTopologyWebServer.html_to_vagrantfile(nodes, edges)

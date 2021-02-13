@@ -48,7 +48,7 @@
         
 
         // parsing and collecting nodes and edges from the python
-        nodes = new vis.DataSet([{"id": 1, "image": "../../Images/webserver.png", "label": "web1", "shape": "image", "type": "web", "network_interfaces":[{"ip_address":"10.0.0.50/24", "netmask":"255.255.255.0", "name_interface":"eth1", "edge": [1, 2]}], "vm_image":"bento/ubuntu-16.04", "ram":"1024", "n_cpus":2,"custom_script": ""},{"id": 2, "image": "../../Images/db.png", "label": "db1", "shape": "image", "type": "Web", "network_interfaces":[{"ip_address":"10.0.0.51/24", "netmask":"255.255.255.0", "name_interface":"eth1", "edge": [1, 2]}], "vm_image":"bento/ubuntu-16.04", "ram":"1024", "n_cpus":"2", "custom_script": ""}]);
+        nodes = new vis.DataSet([{"id": 1, "image": "../../Images/webserver.png", "label": "web1", "shape": "image", "type": "web", "network_interfaces":[{"ip_address":"10.0.0.50/24", "netmask":"255.255.255.0", "name_interface":"eth1", "edge": [1, 2]}], "vm_image":"bento/ubuntu-16.04", "ram":"1024", "n_cpus":2,"custom_script": ""},{"id": 2, "image": "../../Images/db.png", "label": "db1", "shape": "image", "type": "db", "network_interfaces":[{"ip_address":"10.0.0.51/24", "netmask":"255.255.255.0", "name_interface":"eth1", "edge": [1, 2]}], "vm_image":"bento/ubuntu-16.04", "ram":"1024", "n_cpus":"2", "custom_script": ""}]);
         edges = new vis.DataSet([{"from": 1, "to": 2, "bandwidth_up": 0, "bandwidth_down": 0}]);
 
         // adding nodes and edges to the graph
