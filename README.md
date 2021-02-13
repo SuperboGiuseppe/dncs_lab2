@@ -89,7 +89,8 @@ Available features:
 - Provide the functionality to use different Linux machine's flavors for different purposes.
 - Provide the option to control your network in real-time.
 - Provide the option to write and debug the vagrant scripts.
-- Provide also the option of customizing the network topologies.
+- Provide the option of customizing the network topologies.
+- Provide the option of using different Docker images.
 
 ### Built With
 
