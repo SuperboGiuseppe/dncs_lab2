@@ -1,0 +1,27 @@
+# webserver and a host you can access the webserver from your browser with ip address 10.0.0.50 or from the host 
+
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    # Configure web server machine
+     config.vm.define "web1" do |web1|
+         web1.vm.box = "ubuntu/xenial64"
+		 web1.vm.hostname = "web-1"
+         web1.vm.network "private_network", ip: "10.0.0.50"
+         web1.vm.provision "shell", inline: <<-SHELL        
+         echo 'Starting Provision: web server'
+         sudo apt-get update
+         sudo apt-get install -y nginx
+         touch /var/www/html/index.php
+         sudo apt-get install -y php-fpm php-mysql
+         echo 'Provision web server complete'
+		 SHELL
+		 end
+         # Configure database server machine
+         config.vm.define "db1" do |db1|
+         db1.vm.box = "ubuntu/xenial64"
+	     db1.vm.hostname = "db-1"
+		 db1.vm.network "private_network", ip: "10.0.0.51"
+         end
+     end

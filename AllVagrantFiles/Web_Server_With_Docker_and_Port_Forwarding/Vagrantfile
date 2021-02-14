@@ -1,0 +1,19 @@
+## to access webserver try this in your webbrowser : (http://localhost:8081/) you will see the webpage.
+
+## or you can configure one by yourself
+
+
+
+ # -*- mode: ruby -*-
+# vi: set ft=ruby :
+ 
+ Vagrant.configure("2") do |config|
+     config.vm.box = "ubuntu/xenial64"
+     config.vm.network "forwarded_port", guest: 80, host: 8081
+     config.vm.provision "docker" do |doc|
+	     doc.pull_images "nginx"
+         doc.pull_images "mysql"
+		 doc.run "mysql"
+		 doc.run "nginx", args: "-p 80:80"
+     end
+ end
