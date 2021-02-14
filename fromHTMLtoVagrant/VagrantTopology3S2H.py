@@ -15,12 +15,9 @@ def BeginVagrantFile(f):
     f.write('vb.cpus = 1\n')
     f.write('end\n')
 
-
+#this function writes a server in vagrant file
 def writeServer(f,Server,Topology):
 
-    print("adding a router to the vagrant file")
-
-    #extrapolate each attribute from the touples
     Id = Server[1]["Id"]
     Name = Server[1]["Name"]
     Ram = Server[1]["Ram"]
@@ -71,8 +68,6 @@ def writeServer(f,Server,Topology):
     GatewayRouter2 = Topology[4][1]["Network"][1]["Ip"]
     GatewayRouter2 = GatewayRouter2.split("/")[0]
 
-
-
     f.write("config.vm.define \"" + Name+ "\" do |" + Name + "|\n")
     f.write(Name + ".vm.box = \"" + Os + "\"\n")
     f.write(Name + ".vm.hostname = \"" + Name + "\"\n")
@@ -87,16 +82,12 @@ def writeServer(f,Server,Topology):
       f.write("sudo route add -net " + IpNet2 + " netmask " + Mask2 + " gw " + GatewayRouter2 + " dev " + Interface2 + "\n")
       f.write("sudo route add -net " + IpNet8 + " netmask " + Mask8 + " gw " + GatewaySwitch + " dev " + Interface1 + "\n")
       f.write("sudo route add -net " + IpNet12 + " netmask " + Mask12 + " gw " + GatewaySwitch + " dev " + Interface1 + "\n")
-
-
     if Id is 5: 
       f.write("sudo route add -net " + IpNet3 + " netmask " + Mask3 + " gw " + GatewayRouter1 + " dev " + Interface2 + "\n")
       f.write("sudo route add -net " + IpNet8 + " netmask " + Mask8 + " gw " + GatewayRouter1 + " dev " + Interface2 + "\n")
       f.write("sudo route add -net " + IpNet12 + " netmask " + Mask12 + " gw " + GatewayRouter1 + " dev " + Interface2 + "\n")
 
-    #here there is the custum script
-    f.write(CustumScript + " \n")
-
+    f.write(CustumScript + " \n") #here there is the custum script
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write("SHELL\n")
@@ -109,9 +100,6 @@ def writeServer(f,Server,Topology):
 #this function write in the vagrant file a new PC host
 def writeHost(f,Host,Topology):
 
-    print("adding an host to the vagrant file")
-
-    #extrapolate each attribute from the touples
     Id = Host[1]["Id"]
     Name = Host[1]["Name"]
     Os  = Host[1]["Os"]
@@ -186,17 +174,13 @@ def writeHost(f,Host,Topology):
 
     if Id is 4: 
       f.write("sudo route add -net "+ IpNet12 + " netmask " + Mask12 + " gw " + Gateway + " dev " + Interface + "\n")
-
     if Id is 5:
       f.write("sudo route add -net " + IpNet8 + " netmask " + Mask8 + " gw " + Gateway + " dev " + Interface + "\n")
-      
     if Id is 3: 
       f.write("sudo route add -net " + IpNet8 + " netmask " + Mask8 + " gw " + Gateway + " dev " + Interface + "\n")
       f.write("sudo route add -net " + IpNet12 + " netmask " + Mask12 + " gw " + Gateway + " dev " + Interface + "\n")
     
-    #here there is the custum script
-    f.write(CustumScript + " \n")  
-
+    f.write(CustumScript + " \n")  #here there is the custum script
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write("SHELL\n")
@@ -211,6 +195,9 @@ def writeHost(f,Host,Topology):
     f.write("vb.memory = " + Ram + "\n")
     f.write("end\n")
     f.write("end\n")
+
+
+
 
 #this function write in the vagrant file a new Router
 def writeSwitch(f,Switch,Topology):
@@ -246,8 +233,6 @@ def writeSwitch(f,Switch,Topology):
     Network4 = ipcalc.Network(Ip4)
     IpNet4 = str(Network4.network())
 
-
-    print("adding a switch to the vagrant file")
     f.write("config.vm.define \"" + Name + "\" do |" + Name + "|\n")
     f.write(Name + ".vm.box = \"" + Os +"\"\n")
     f.write(Name + ".vm.hostname = \"" + Name + "\"\n")
@@ -283,14 +268,11 @@ def writeSwitch(f,Switch,Topology):
     f.write("sudo route add -net " + IpNet2 +" netmask " + Mask2 + " gw " + Gateway + " dev " + InterfaceSW + "\n")
     f.write("sudo route add -net " + IpNet4 +" netmask " + Mask4 + " gw " + Gateway + " dev " + InterfaceSW + "\n")
 
-    #here there is the custum script
-    f.write(CustumScript + " \n")
-
+    f.write(CustumScript + " \n") #here there is the custum script
     f.write("echo \"Configuration END\"\n")
     f.write("echo \""+ Name + " is ready to Use\"\n")
     f.write("SHELL\n")
     f.write(Name + ".vm.provider \"virtualbox\" do |vb|\n")
-    # User can select the desired menmory for the machine. we must allow them
     f.write("vb.memory = " + Ram +"\n")
     f.write("end\n")
     f.write("end\n")

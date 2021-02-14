@@ -11,7 +11,6 @@ def BeginVagrantFile(f,Docker):
     f.write('## to access webserver try this in your webbrowser : (http://localhost:8081/) you will see the webpage.\n')
     f.write('# -*- mode: ruby -*-\n')
     f.write('# vi: set ft=ruby :\n')
- 
     f.write('Vagrant.configure("2") do |config|\n')
     f.write('config.vm.box = \"' + Os + '\"\n')
     f.write('config.vm.network "forwarded_port", guest: 80, host: 8081\n')
@@ -20,11 +19,8 @@ def BeginVagrantFile(f,Docker):
     f.write('doc.pull_images "mysql"\n')
     f.write('doc.run "mysql"\n')
     f.write('doc.run "nginx", args: "-p 80:80"\n')
-
     f.write(Name + '.vm.provision "shell", run: "always", inline: <<-SHELL\n')
-    #here there is the custum script
-    f.write(CustumScript + " \n")
-
+    f.write(CustumScript + " \n") #here there is the custum script
     f.write('end\n')
     f.write('end\n')
 

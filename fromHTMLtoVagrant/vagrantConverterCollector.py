@@ -1,4 +1,4 @@
-import VagrantTopologyOSPF, VagrantTopologyDocker, VagrantTopologyMySQL, VagrantTopologySwitch, VagrantTopologyWebServer
+import VagrantTopologyOSPF, VagrantTopologyDocker, VagrantTopologyMySQL, VagrantTopologySwitch, VagrantTopologyWebServer, VagrantTopology3S2H
 import codecs
 import yaml
 
@@ -40,3 +40,5 @@ def converter_selector(network_path, template):
         VagrantTopologySwitch.html_to_vagrantfile(nodes, edges)
     if(template == "WebServer"):
         VagrantTopologyWebServer.html_to_vagrantfile(nodes, edges)
+    if(template == "3S2H"):
+        VagrantTopology3S2H.html_to_vagrantfile(nodes, edges)    

@@ -5,9 +5,7 @@ import yaml
 #this function writes the beginning of the VagrantFile
 def BeginVagrantFile(f):
 
-   # print("writing the beginning of the vagrant file")
-    
-    f.write("# -*- mode: ruby -*- \n# vi: set ft=ruby :\n\n")
+      f.write("# -*- mode: ruby -*- \n# vi: set ft=ruby :\n\n")
     f.write("#All Vagrant configuration is done below. The 2 in Vagrant.configure\n#configures the configuration version we support older styles for\n#backwards compatibility. Please don't change it unless you know what\n#you're doing.\n")
     f.write("Vagrant.configure(\"2\") do |config|\n")
     f.write("config.vm.box_check_update = true\n")
@@ -23,11 +21,8 @@ def BeginVagrantFile(f):
 
 
 #this function write in the vagrant file a new PC host
-def writeHost(f,Host):
+def writeHost(f,Host, edges):
 
-  #  print("adding an host to the vagrant file")
-
-    #extrapolate each attribute from the touples
     Id = Host[1]["Id"]
     Name = Host[1]["Name"]
     Ram = Host[1]["Ram"]
@@ -42,7 +37,6 @@ def writeHost(f,Host):
     Network = ipcalc.Network(Ip)
     IpNet = Network.network()
 
-    #there must be a more efficient way to calculate this, this one is too trivial
     for x in Network:
       Gateway = str(x)
 
@@ -57,15 +51,11 @@ def writeHost(f,Host):
     if Id is 6:
         f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub +"\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_router-south-3\", auto_config: true\n")
     
-    
     f.write(Name + ".vm.provision \"shell\", run: \"always\", inline: <<-SHELL\n")
     f.write("echo \"Static Routig configuration Started for " + Name + "\"\n")
     f.write("sudo sysctl -w net.ipv4.ip_forward=1\n")
     f.write("sudo route add -net " + str(IpNet) + " netmask " + Netmask + " gw " + Gateway + " dev " + Interface + "\n")
-
-    #here there is the custum script
-    f.write(CustumScript + " \n")
-
+    f.write(CustumScript + " \n")#here there is the custum script
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write("SHELL\n")
@@ -78,11 +68,8 @@ def writeHost(f,Host):
 
 
 #this function write in the vagrant file a new Router
-def writeRouter(f,Router):
+def writeRouter(f,Router, edges):
 
-   # print("adding a router to the vagrant file") 
-
-    #extrapolate each attribute from the touples
     Id = Router[1]["Id"]
     Name = Router[1]["Name"]
     Ram = Router[1]["Ram"]
@@ -121,8 +108,6 @@ def writeRouter(f,Router):
     IpNet3 = Network3.network()
     for x in Network3:
       Gateway3 = str(x)     
-
-
 
     f.write("config.vm.define \""+ Name +"\" do |" + Name + "|\n")
     f.write(Name + ".vm.box = \"" + Os + "\"\n")
@@ -176,10 +161,7 @@ def writeRouter(f,Router):
     f.write("exit\n")
     f.write("ip forwarding\n")
     f.write("exit'\n")
-
-    #here there is the custum script
-    f.write(CustumScript + " \n")
-
+    f.write(CustumScript + " \n") #here there is the custum script
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write("SHELL\n")
@@ -345,6 +327,15 @@ def remap(newList):
 def html_to_vagrantfile(listOfDevice):
     VagrantFile = open("VagrantfileOSPF", "w")
 
+    BeginVagrantFile(VagrantFile)
+    for node in nodes:
+      if node["type"] == "router":
+        writeRouter(VagrantFile, node, edges)
+      if node["type"] == "host":
+        writeHost(VagrantFile, node, edges)        
+
+    VagrantFile.close()
+
     #read the data structure from input
     #Network = G.nodes.data():
     #file = codecs.open(network_path, "r", "utf-8")
@@ -356,34 +347,32 @@ def html_to_vagrantfile(listOfDevice):
       #listOfDevice = yaml.load(listOfDevice) 
 
 
-    Network = remap(listOfDevice)
+    #Network = remap(listOfDevice)
     #Network = listOfDevice
     #N.B per Luca, Network è già la lista dei nodi che puoi esplorare
 
     #first, let's write the beginnig of the VagrantFile
-    BeginVagrantFile(VagrantFile)
-
 
     #second, let's write each device with his feature
     #this topology has 3 hosts and 3 routers
     #call the respective function to "populate" the vagrant file
 
-    for device in Network: 
-        typeOfDevice = device[1]["Type"]
+    #BeginVagrantFile(VagrantFile)
+
+    #for device in Network: 
+    #    typeOfDevice = device[1]["Type"]
         #print("the device is a " + typeOfDevice)
 
-        if typeOfDevice is "Router":
-            writeRouter(VagrantFile,device)
+    #    if typeOfDevice is "Router":
+    #        writeRouter(VagrantFile,device)
 
 
-    for device in Network:
-        typeOfDevice = device[1]["Type"]
+    #for device in Network:
+    #    typeOfDevice = device[1]["Type"]
         #print("the device is a " + typeOfDevice)
 
-        if typeOfDevice is "Host":
-            writeHost(VagrantFile,device)
+    #    if typeOfDevice is "Host":
+    #        writeHost(VagrantFile,device)
 
-    VagrantFile.write("end\n")
-    VagrantFile.close()
 
-#html_to_vagrantfile(MyNet)
+

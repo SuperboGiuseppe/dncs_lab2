@@ -21,9 +21,6 @@ def BeginVagrantFile(f,Network):
 #this function write in the vagrant file a new PC host
 def writeHost(f,Host,Topology):
 
-    print("adding an host to the vagrant file")
-
-    #extrapolate each attribute from the touples
     Id = Host[1]["Id"]
     Name = Host[1]["Name"]
     Os  = Host[1]["Os"]
@@ -82,12 +79,6 @@ def writeHost(f,Host,Topology):
     if Id is 3:
       f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub + "\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_router-south-2\", auto_config: true\n") 
     
-    f.write("#.vm.provision \"shell\", inline: <<-SHELL\n")
-    f.write("#echo \"Installation of Lynx Text-Based Browser to access the Web-Server via terminal on " + Name + "\"\n")
-    f.write("#sudo apt-get update\n")
-    f.write("#sudo apt-get install -y lynx\n")
-    f.write("#echo \"Lynx-Browser is installed\"\n")
-    f.write("#SHELL\n")
     f.write(Name + ".vm.provision \"shell\", run: \"always\", inline: <<-SHELL\n")
     f.write("echo \"Static Routig configuration Started for " + Name + "\"\n")
     f.write("sudo sysctl -w net.ipv4.ip_forward=1\n")
@@ -98,17 +89,14 @@ def writeHost(f,Host,Topology):
 
     if Id is 1: 
       f.write("sudo route add -net "+ IpNet12 + " netmask " + Mask12 + " gw " + Gateway + " dev " + Interface + "\n")
-
     if Id is 2:
       f.write("sudo route add -net " + IpNet8 + " netmask " + Mask8 + " gw " + Gateway + " dev " + Interface + "\n")
-      
     if Id is 3: 
       f.write("sudo route add -net " + IpNet8 + " netmask " + Mask8 + " gw " + Gateway + " dev " + Interface + "\n")
       f.write("sudo route add -net " + IpNet12 + " netmask " + Mask12 + " gw " + Gateway + " dev " + Interface + "\n")
     
-    #here there is the custum script
-    f.write(CustumScript + " \n")  
-
+    
+    f.write(CustumScript + " \n")  #here there is the custum script
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write("SHELL\n")
@@ -130,9 +118,6 @@ def writeHost(f,Host,Topology):
 #this function write in the vagrant file a new Router
 def writeRouter(f,Router,Topology):
 
-    print("adding a router to the vagrant file")
-
-    #extrapolate each attribute from the touples
     Id = Router[1]["Id"]
     Name = Router[1]["Name"]
     Ram = Router[1]["Ram"]
@@ -183,8 +168,6 @@ def writeRouter(f,Router,Topology):
     GatewayRouter2 = Topology[4][1]["Network"][1]["Ip"]
     GatewayRouter2 = GatewayRouter2.split("/")[0]
 
-
-
     f.write("config.vm.define \"" + Name+ "\" do |" + Name + "|\n")
     f.write(Name + ".vm.box = \"" + Os + "\"\n")
     f.write(Name + ".vm.hostname = \"" + Name + "\"\n")
@@ -199,16 +182,12 @@ def writeRouter(f,Router,Topology):
       f.write("sudo route add -net " + IpNet2 + " netmask " + Mask2 + " gw " + GatewayRouter2 + " dev " + Interface2 + "\n")
       f.write("sudo route add -net " + IpNet8 + " netmask " + Mask8 + " gw " + GatewaySwitch + " dev " + Interface1 + "\n")
       f.write("sudo route add -net " + IpNet12 + " netmask " + Mask12 + " gw " + GatewaySwitch + " dev " + Interface1 + "\n")
-
-
     if Id is 5: 
       f.write("sudo route add -net " + IpNet3 + " netmask " + Mask3 + " gw " + GatewayRouter1 + " dev " + Interface2 + "\n")
       f.write("sudo route add -net " + IpNet8 + " netmask " + Mask8 + " gw " + GatewayRouter1 + " dev " + Interface2 + "\n")
       f.write("sudo route add -net " + IpNet12 + " netmask " + Mask12 + " gw " + GatewayRouter1 + " dev " + Interface2 + "\n")
 
-    #here there is the custum script
-    f.write(CustumScript + " \n")
-
+    f.write(CustumScript + " \n") #here there is the custum script
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write("SHELL\n")
@@ -220,7 +199,6 @@ def writeRouter(f,Router,Topology):
 #this function write in the vagrant file a new Router
 def writeSwitch(f,Switch,Topology):
 
-    #extrapolate each attribute from the touples
     Name = Switch[1]["Name"]
     Ram = Switch[1]["Ram"]
     Os  = Switch[1]["Os"]
@@ -251,8 +229,6 @@ def writeSwitch(f,Switch,Topology):
     Network4 = ipcalc.Network(Ip4)
     IpNet4 = str(Network4.network())
 
-
-    print("adding a switch to the vagrant file")
     f.write("config.vm.define \"" + Name + "\" do |" + Name + "|\n")
     f.write(Name + ".vm.box = \"" + Os +"\"\n")
     f.write(Name + ".vm.hostname = \"" + Name + "\"\n")
@@ -288,14 +264,11 @@ def writeSwitch(f,Switch,Topology):
     f.write("sudo route add -net " + IpNet2 +" netmask " + Mask2 + " gw " + Gateway + " dev " + InterfaceSW + "\n")
     f.write("sudo route add -net " + IpNet4 +" netmask " + Mask4 + " gw " + Gateway + " dev " + InterfaceSW + "\n")
 
-    #here there is the custum script
-    f.write(CustumScript + " \n")
-
+    f.write(CustumScript + " \n") #here there is the custum script
     f.write("echo \"Configuration END\"\n")
     f.write("echo \""+ Name + " is ready to Use\"\n")
     f.write("SHELL\n")
     f.write(Name + ".vm.provider \"virtualbox\" do |vb|\n")
-    # User can select the desired menmory for the machine. we must allow them
     f.write("vb.memory = " + Ram +"\n")
     f.write("end\n")
     f.write("end\n")
@@ -410,41 +383,50 @@ fakeNet = [host1,host2,host3,rout1,rout2,switch1]
 def html_to_vagrantfile(Network):
     VagrantFile = open("VagrantfileSWITCH", "w")
 
+    BeginVagrantFile(VagrantFile)
+    for node in nodes:
+      if node["type"] == "router":
+        writeRouter(VagrantFile, node, edges)
+      if node["type"] == "switch":
+        writeSwitch(VagrantFile, node, edges)
+      if node["type"] == "host":
+        writeDatabase(VagrantFile, node, edges)        
+    
+    VagrantFile.close()
+
+
     #read the data structure from input
     #Network = G.nodes.data():
     #Network = fakeNet
     #N.B per Luca, Network è già la lista dei nodi che puoi esplorare
 
     #first, let's write the beginnig of the VagrantFile
-    BeginVagrantFile(VagrantFile,Network)
+    #BeginVagrantFile(VagrantFile,Network)
 
 
     #second, let's write each device with his feature
     #this topology has 3 hosts, 1 switch and 3 routers
-    for device in Network:
+    #for device in Network:
         #call the respective function to "populate" the vagrant file
-        typeOfDevice = device[1]["Type"]
-        print("the device is a " + typeOfDevice)
+    #    typeOfDevice = device[1]["Type"]
+    #    print("the device is a " + typeOfDevice)
 
-        if typeOfDevice is "Router":
-            writeRouter(VagrantFile,device,Network)
+    #    if typeOfDevice is "Router":
+    #        writeRouter(VagrantFile,device,Network)
 
-    for device in Network:
+    #for device in Network:
         #call the respective function to "populate" the vagrant file
-        typeOfDevice = device[1]["Type"]
-        print("the device is a " + typeOfDevice)
-        if typeOfDevice is "Switch":
-            writeSwitch(VagrantFile,device,Network)
+    #    typeOfDevice = device[1]["Type"]
+    #    print("the device is a " + typeOfDevice)
+    #    if typeOfDevice is "Switch":
+    #        writeSwitch(VagrantFile,device,Network)
 
 
-    for device in Network:
+    #for device in Network:
         #call the respective function to "populate" the vagrant file
-        typeOfDevice = device[1]["Type"]
-        print("the device is a " + typeOfDevice)
-        if typeOfDevice is "Host":
-            writeHost(VagrantFile,device,Network)
-
-    VagrantFile.write("end\n")
-    VagrantFile.close()
+    #    typeOfDevice = device[1]["Type"]
+    #    print("the device is a " + typeOfDevice)
+    #    if typeOfDevice is "Host":
+    #        writeHost(VagrantFile,device,Network)
 
 

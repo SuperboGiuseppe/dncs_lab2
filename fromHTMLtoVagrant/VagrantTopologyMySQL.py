@@ -5,10 +5,8 @@ import yaml
 def BeginVagrantFile(f):
 
     f.write("##### One Host and a Mysql server with the Docker ####")
-
     f.write("# -*- mode: ruby -*-\n")
     f.write("# vi: set ft=ruby :\n")
-
     f.write("# All Vagrant configuration is done below. The \"2\" in Vagrant.configure\n")
     f.write("# configures the configuration version (we support older styles for\n")
     f.write("# backwards compatibility). Please don't change it unless you know what\n")
@@ -29,9 +27,6 @@ def BeginVagrantFile(f):
 #this function write in the vagrant file a new PC host
 def writeHost(f,Host):
 
-  #  print("adding an host to the vagrant file")
-
-    #extrapolate each attribute from the touples
     Id = Host[1]["Id"]
     Name = Host[1]["Name"]
     Ram = Host[1]["Ram"]
@@ -46,7 +41,6 @@ def writeHost(f,Host):
     Network = ipcalc.Network(Ip)
     IpNet = Network.network()
 
-    #there must be a more efficient way to calculate this, this one is too trivial
     for x in Network:
       Gateway = str(x)
 
@@ -54,15 +48,13 @@ def writeHost(f,Host):
     f.write(Name + ".vm.box = \"" + Os + "\"\n")
     f.write(Name + ".vm.hostname = \"" + Name + "\"\n")
 
-    
     f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub +"\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_router-south-1\", auto_config: true\n") 
     f.write(Name + ".vm.provision \"shell\", run: \"always\", inline: <<-SHELL\n")
     f.write("echo \"Static Routig configuration Started for " + Name + "\"\n")
     f.write("sudo sysctl -w net.ipv4.ip_forward=1\n")
     f.write("sudo route add -net " + str(IpNet) + " netmask " + Netmask + " gw " + Gateway + " dev " + Interface + "\n")
 
-    #here there is the custum script
-    f.write(CustumScript + " \n")
+    f.write(CustumScript + " \n") #here there is the custum script
 
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
@@ -72,6 +64,9 @@ def writeHost(f,Host):
     f.write("end\n")
     f.write("end\n")
 
+
+
+#this function write in the vagrant file a new Web server
 def writeWebServer(f,Web):
 
     Id = Web[1]["Id"]
@@ -93,15 +88,15 @@ def writeWebServer(f,Web):
     f.write('config.vm.define \"' + Name + '\" do |' + Name + '|\n')
     f.write(Name + '.vm.box = \"' + Os + '\" \n')
     f.write(Name + '.vm.hostname = \"' + Name + '\"\n')
+
     f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub +"\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_router-south-2\", auto_config: true\n") 
     f.write(Name + '.vm.provision "shell", run: "always", inline: <<-SHELL\n')
     f.write('echo "Static Routig configuration Started for ' + Name + '\"\n')
     f.write('sudo sysctl -w net.ipv4.ip_forward=1\n')
+
     f.write("sudo route add -net " + str(IpNet) + " netmask " + Netmask + " gw " + Gateway + " dev " + Interface + "\n")
 
-    #here there is the custum script
-    f.write(CustumScript + " \n")
-
+    f.write(CustumScript + " \n") #here there is the custum script
     f.write('echo "Configuration END"\n')
     f.write('#echo ' + Name + ' is ready to Use"\n')
     f.write('SHELL\n')
@@ -116,8 +111,12 @@ def writeWebServer(f,Web):
     f.write('end\n')
     f.write('end\n')
 
+
+
+
+#this function write in the vagrant file a new DB
 def writeDatabase(f,Db):
-    # Configure database server machine
+   
     Id = Db[1]["Id"]
     Name = Db[1]["Name"]
     Ram = Db[1]["Ram"]
@@ -137,15 +136,15 @@ def writeDatabase(f,Db):
     f.write('config.vm.define \"' + Name + '\" do |' + Name + '|\n')
     f.write(Name + '.vm.box = \"' + Os + '\" \n')
     f.write(Name + '.vm.hostname = \"' + Name + '\" \n')
+
     f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub +"\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_router-south-3\", auto_config: true\n") 
     f.write(Name + '.vm.provision "shell", run: "always", inline: <<-SHELL\n')
     f.write('echo "Static Routig configuration Started for db-1"\n')
     f.write('sudo sysctl -w net.ipv4.ip_forward=1\n')
+
     f.write("sudo route add -net " + str(IpNet) + " netmask " + Netmask + " gw " + Gateway + " dev " + Interface + "\n")
-
-    #here there is the custum script
-    f.write(CustumScript + " \n")
-
+    
+    f.write(CustumScript + " \n")#here there is the custum script
     f.write('echo "Configuration END"\n')
     f.write('#echo "Host--B is ready to Use"	\n')
     f.write('SHELL\n')
@@ -161,12 +160,10 @@ def writeDatabase(f,Db):
 
 
 
+
 #this function write in the vagrant file a new Router
 def writeRouter(f,Router):
 
-   # print("adding a router to the vagrant file") 
-
-    #extrapolate each attribute from the touples
     Id = Router[1]["Id"]
     Name = Router[1]["Name"]
     Ram = Router[1]["Ram"]
