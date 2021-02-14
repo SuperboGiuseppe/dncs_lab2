@@ -182,6 +182,7 @@ class network_design_window(QtWidgets.QMainWindow):
         self.button_destroy.setStatusTip("Destroy the current deployed virtual machines")
         self.button_destroy.setToolTip("Destroy the current deployed virtual machines")
         self.button_destroy.setIconText("Destroy network")
+        self.button_destroy.triggered.connect(lambda: self.vagrant_destroy())
         self.button_destroy.setDisabled(True)
         
         self.main_toolbar.addAction(self.button_new)
@@ -270,7 +271,7 @@ class network_design_window(QtWidgets.QMainWindow):
         self.debug_console_textedit.setReadOnly(True)
         self.debug_console_frame.move(5,430)
         self.debug_console_frame.setMinimumHeight(220)
-        self.debug_console_frame.setMinimumWidth(1015)
+        self.debug_console_frame.setMinimumWidth(1168)
         self.debug_console_textedit.resize(self.debug_console_textedit.sizeHint().width(), self.debug_console_textedit.minimumHeight())
         self.debug_console_textedit.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.debug_console_label = QtWidgets.QLabel("Debug console")
@@ -285,8 +286,17 @@ class network_design_window(QtWidgets.QMainWindow):
         print("./" + self.current_network_name)
         print(self.current_network_template)
         vagrantConverterCollector.converter_selector(self.current_network_path, self.current_network_template)
-        #self.debug_console_textedit.clear()
-        #self.vagrant_process.start('vagrant up')
+        self.debug_console_textedit.clear()
+        self.vagrant_process.start('vagrant up')
+        self.button_vagrant.setDisabled(True)
+        self.button_dashboard.setEnabled(True)
+        self.button_destroy.setEnabled(True)
+
+    def vagrant_destroy(self):
+        self.vagrant_process.start('vagrant destroy -f')
+        self.button_dashboard.setDisabled(True)
+        self.button_vagrant.setEnabled(True)
+        self.button_destroy.setDisabled(True)
 
     
     def onReadyReadStandardOutput(self):
@@ -824,9 +834,9 @@ class edge_editors(QtWidgets.QMainWindow):
         self.button_frame.setLayout(self.button_layout)
         self.window_layout.addWidget(QtWidgets.QLabel("Select the edge:"), 0, 0)
         self.window_layout.addWidget(self.edge_combobox, 1, 0, 1, 2)
-        self.window_layout.addWidget(QtWidgets.QLabel("Bandwidth uplink (Mbps):"), 2, 0)
+        self.window_layout.addWidget(QtWidgets.QLabel("Bandwidth uplink (kbps):"), 2, 0)
         self.window_layout.addWidget(self.bandwidth_up_textbox, 2,1)
-        self.window_layout.addWidget(QtWidgets.QLabel("Bandwidth downlink (Mbps):"), 3, 0)
+        self.window_layout.addWidget(QtWidgets.QLabel("Bandwidth downlink (kbps):"), 3, 0)
         self.window_layout.addWidget(self.bandwidth_down_textbox, 3,1)
         self.window_layout.addItem(QtWidgets.QSpacerItem(400, 220), 4, 0, 1, 2)
         self.window_layout.addWidget(self.button_frame, 5, 0, 1, 2)

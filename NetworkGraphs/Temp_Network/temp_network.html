@@ -48,7 +48,7 @@
 
         // parsing and collecting nodes and edges from the python
         nodes = new vis.DataSet([{"custom_script": "", "id": 1, "image": "../../Images/webserver.png", "label": "web1", "n_cpus": 2, "network_interfaces": [{"edge": [1, 2], "ip_address": "10.0.0.50/24", "name_interface": "eth1", "netmask": "255.255.255.0"}], "ram": "1024", "shape": "image", "type": "web", "vm_image": "bento/ubuntu-16.04"}, {"custom_script": "", "id": 2, "image": "../../Images/db.png", "label": "db1", "n_cpus": "2", "network_interfaces": [{"edge": [1, 2], "ip_address": "10.0.0.51/24", "name_interface": "eth1", "netmask": "255.255.255.0"}], "ram": "1024", "shape": "image", "type": "db", "vm_image": "bento/ubuntu-16.04"}]);
-        edges = new vis.DataSet([{"bandwidth_down": 10, "bandwidth_up": 10, "from": 1, "to": 2}]);
+        edges = new vis.DataSet([{"bandwidth_down": 1024, "bandwidth_up": 1024, "from": 1, "to": 2}]);
 
         // adding nodes and edges to the graph
         data = {nodes: nodes, edges: edges};

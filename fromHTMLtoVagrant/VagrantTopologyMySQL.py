@@ -5,8 +5,10 @@ import yaml
 def BeginVagrantFile(f):
 
     f.write("##### One Host and a Mysql server with the Docker ####")
+
     f.write("# -*- mode: ruby -*-\n")
     f.write("# vi: set ft=ruby :\n")
+
     f.write("# All Vagrant configuration is done below. The \"2\" in Vagrant.configure\n")
     f.write("# configures the configuration version (we support older styles for\n")
     f.write("# backwards compatibility). Please don't change it unless you know what\n")
@@ -25,22 +27,33 @@ def BeginVagrantFile(f):
 
 
 #this function write in the vagrant file a new PC host
-def writeHost(f,Host):
+def writeHost(f, Host, edges):
 
-    Id = Host[1]["Id"]
-    Name = Host[1]["Name"]
-    Ram = Host[1]["Ram"]
-    Os  = Host[1]["Os"]
-    CustumScript = Host[1]["custom_script"]
+  #  print("adding an host to the vagrant file")
+
+    #extrapolate each attribute from the touples
+    Id = Host["id"]
+    Name = Host["label"]
+    Os  = Host["vm_image"]
+    Ram = Host"ram"]
+    N_Cpus = Host["n_cpus"]
+    Ip = Host["network_interfaces"][0]["ip_address"]
+    Netmask = Host["network_interfaces"][0]["netmask"]
+    Interface = Host["network_interfaces"][0]["name_interface"]
+    EdgeReference = Host["network_interfaces"][0]["edge"]
+    UplinkBandwidth = 0
+    DownlinkBandwidth = 0
+    for edge in edges:
+      if EdgeReference[0] == edge["from"] and EdgeReference[1] == edge["to"]:
+        UplinkBandwidth = edge["bandwidth_up"]
+        DownlinkBandwidth = edge["bandwidth_down"]
     
-    Ip = Host[1]["Network"][0]["Ip"]
-    Netmask = Host[1]["Network"][0]["Netmask"]
-    Interface = Host[1]["Network"][0]["Interface"]
     IpNoSub = Ip.split("/")[0]
-
     Network = ipcalc.Network(Ip)
     IpNet = Network.network()
 
+    CustumScript = Host["custom_script"]
+    #there must be a more efficient way to calculate this, this one is too trivial
     for x in Network:
       Gateway = str(x)
 
@@ -48,13 +61,25 @@ def writeHost(f,Host):
     f.write(Name + ".vm.box = \"" + Os + "\"\n")
     f.write(Name + ".vm.hostname = \"" + Name + "\"\n")
 
+    
     f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub +"\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_router-south-1\", auto_config: true\n") 
     f.write(Name + ".vm.provision \"shell\", run: \"always\", inline: <<-SHELL\n")
     f.write("echo \"Static Routig configuration Started for " + Name + "\"\n")
     f.write("sudo sysctl -w net.ipv4.ip_forward=1\n")
     f.write("sudo route add -net " + str(IpNet) + " netmask " + Netmask + " gw " + Gateway + " dev " + Interface + "\n")
-
-    f.write(CustumScript + " \n") #here there is the custum script
+    f.write('cd /home/vagrant\n')
+    f.write('git clone https://github.com/magnific0/wondershaper.git\n')
+    f.write('cd wondershaper\n')
+    for edge in edges:
+      if UplinkBandwidth > 0 or DownlinkBandwidth > 0:
+        f.write('sudo ./wondershaper -a ' + Interface)
+        if DownlinkBandwidth > 0:
+          f.write(' -d ' + str(DownlinkBandwidth))
+        if UplinkBandwidth > 0:
+          f.write(' -u ' + str(UplinkBandwidth))
+        f.write('\n')
+    #here there is the custum script
+    f.write(CustumScript + " \n")
 
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
@@ -64,22 +89,26 @@ def writeHost(f,Host):
     f.write("end\n")
     f.write("end\n")
 
+def writeWebServer(f, Web, edges):
 
-
-#this function write in the vagrant file a new Web server
-def writeWebServer(f,Web):
-
-    Id = Web[1]["Id"]
-    Name = Web[1]["Name"]
-    Ram = Web[1]["Ram"]
-    Os  = Web[1]["Os"]
-    CustumScript = Web[1]["custom_script"]
+    Id = Web["id"]
+    Name = Web["label"]
+    Os  = Web["vm_image"]
+    Ram = Web["ram"]
+    N_Cpus = Web["n_cpus"]
     
-    Ip = Web[1]["Network"][0]["Ip"]
-    Netmask = Web[1]["Network"][0]["Netmask"]
-    Interface = Web[1]["Network"][0]["Interface"]
+    Ip = Web["network_interfaces"][0]["ip_address"]
+    Netmask = Web["network_interfaces"][0]["netmask"]
+    Interface = Web["network_interfaces"][0]["name_interface"]
+    EdgeReference = Web["network_interfaces"][0]["edge"]
+    UplinkBandwidth = 0
+    DownlinkBandwidth = 0
+    for edge in edges:
+      if EdgeReference[0] == edge["from"] and EdgeReference[1] == edge["to"]:
+        UplinkBandwidth = edge["bandwidth_up"]
+        DownlinkBandwidth = edge["bandwidth_down"]
+    CustumScript = Web["custom_script"]
     IpNoSub = Ip.split("/")[0]
-
     Network = ipcalc.Network(Ip)
     IpNet = Network.network()
     for x in Network:
@@ -88,15 +117,24 @@ def writeWebServer(f,Web):
     f.write('config.vm.define \"' + Name + '\" do |' + Name + '|\n')
     f.write(Name + '.vm.box = \"' + Os + '\" \n')
     f.write(Name + '.vm.hostname = \"' + Name + '\"\n')
-
     f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub +"\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_router-south-2\", auto_config: true\n") 
     f.write(Name + '.vm.provision "shell", run: "always", inline: <<-SHELL\n')
     f.write('echo "Static Routig configuration Started for ' + Name + '\"\n')
     f.write('sudo sysctl -w net.ipv4.ip_forward=1\n')
-
     f.write("sudo route add -net " + str(IpNet) + " netmask " + Netmask + " gw " + Gateway + " dev " + Interface + "\n")
+    f.write('cd /home/vagrant\n')
+    f.write('git clone https://github.com/magnific0/wondershaper.git\n')
+    f.write('cd wondershaper\n')
+    if UplinkBandwidth > 0 or DownlinkBandwidth > 0:
+      f.write('sudo ./wondershaper -a ' + Interface)
+      if DownlinkBandwidth > 0:
+        f.write(' -d ' + str(DownlinkBandwidth))
+      if UplinkBandwidth > 0:
+        f.write(' -u ' + str(UplinkBandwidth))
+      f.write('\n')
+    #here there is the custum script
+    f.write(CustumScript + " \n")
 
-    f.write(CustumScript + " \n") #here there is the custum script
     f.write('echo "Configuration END"\n')
     f.write('#echo ' + Name + ' is ready to Use"\n')
     f.write('SHELL\n')
@@ -111,23 +149,24 @@ def writeWebServer(f,Web):
     f.write('end\n')
     f.write('end\n')
 
+def writeDatabase(f, Db, edges):
+    # Configure database server machine
+    Id = Db["id"]
+    Name = Db["label"]
+    Os  = Db["vm_image"]
 
-
-
-#this function write in the vagrant file a new DB
-def writeDatabase(f,Db):
-   
-    Id = Db[1]["Id"]
-    Name = Db[1]["Name"]
-    Ram = Db[1]["Ram"]
-    Os  = Db[1]["Os"]
-    CustumScript = Db[1]["custom_script"]
-
-    Ip = Db[1]["Network"][0]["Ip"]
-    Netmask = Db[1]["Network"][0]["Netmask"]
-    Interface = Db[1]["Network"][0]["Interface"]
+    Ip = Db["network_interfaces"][0]["ip_address"]
+    Netmask = Db["network_interfaces"][0]["netmask"]
+    Interface = Db["network_interfaces"][0]["name_interface"]
+    EdgeReference = Db["network_interfaces"][0]["edge"]
+    UplinkBandwidth = 0
+    DownlinkBandwidth = 0
+    for edge in edges:
+      if EdgeReference[0] == edge["from"] and EdgeReference[1] == edge["to"]:
+        UplinkBandwidth = edge["bandwidth_up"]
+        DownlinkBandwidth = edge["bandwidth_down"]
+    CustumScript = Db["custom_script"]
     IpNoSub = Ip.split("/")[0]
-
     Network = ipcalc.Network(Ip)
     IpNet = Network.network()
     for x in Network:
@@ -136,15 +175,25 @@ def writeDatabase(f,Db):
     f.write('config.vm.define \"' + Name + '\" do |' + Name + '|\n')
     f.write(Name + '.vm.box = \"' + Os + '\" \n')
     f.write(Name + '.vm.hostname = \"' + Name + '\" \n')
-
     f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub +"\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_router-south-3\", auto_config: true\n") 
     f.write(Name + '.vm.provision "shell", run: "always", inline: <<-SHELL\n')
     f.write('echo "Static Routig configuration Started for db-1"\n')
     f.write('sudo sysctl -w net.ipv4.ip_forward=1\n')
-
     f.write("sudo route add -net " + str(IpNet) + " netmask " + Netmask + " gw " + Gateway + " dev " + Interface + "\n")
-    
-    f.write(CustumScript + " \n")#here there is the custum script
+    f.write('cd /home/vagrant\n')
+    f.write('git clone https://github.com/magnific0/wondershaper.git\n')
+    f.write('cd wondershaper\n')
+    if UplinkBandwidth > 0 or DownlinkBandwidth > 0:
+      f.write('sudo ./wondershaper -a ' + Interface)
+      if DownlinkBandwidth > 0:
+        f.write(' -d ' + str(DownlinkBandwidth))
+      if UplinkBandwidth > 0:
+        f.write(' -u ' + str(UplinkBandwidth))
+      f.write('\n')
+
+    #here there is the custum script
+    f.write(CustumScript + " \n")
+
     f.write('echo "Configuration END"\n')
     f.write('#echo "Host--B is ready to Use"	\n')
     f.write('SHELL\n')
@@ -160,30 +209,54 @@ def writeDatabase(f,Db):
 
 
 
-
 #this function write in the vagrant file a new Router
-def writeRouter(f,Router):
+def writeRouter(f, Router, edges):
 
-    Id = Router[1]["Id"]
-    Name = Router[1]["Name"]
-    Ram = Router[1]["Ram"]
-    Os  = Router[1]["Os"]
+   # print("adding a router to the vagrant file") 
 
-    Ip1 = Router[1]["Network"][0]["Ip"]
-    Netmask1 = Router[1]["Network"][0]["Netmask"]
-    Interface1 = Router[1]["Network"][0]["Interface"]
+    #extrapolate each attribute from the touples
+    Id = Router["id"]
+    Name = Router["label"]
+    Os  = Router["vm_image"]
+    Ram = Router["ram"]
+    N_Cpus = Router["n_cpus"]
+
+    Ip1 = Router["network_interfaces"][0]["ip_address"]
+    Netmask1 = Router["network_interfaces"][0]["netmask"]
+    Interface1 = Router["network_interfaces"][0]["name_interface"]
+    EdgeReference1 = Router["network_interfaces"][0]["edge"]
+    UplinkBandwidth1 = 0
+    DownlinkBandwidth1 = 0
+    for edge in edges:
+      if EdgeReference1[0] == edge["from"] and EdgeReference1[1] == edge["to"]:
+        UplinkBandwidth1 = edge["bandwidth_up"]
+        DownlinkBandwidth1 = edge["bandwidth_down"]
     IpNoSub1 = Ip1.split("/")[0]
     NetmaskAbbr1 = Ip1.split("/")[1]
 
-    Ip2 = Router[1]["Network"][1]["Ip"]
-    Netmask2 = Router[1]["Network"][1]["Netmask"]
-    Interface2 = Router[1]["Network"][1]["Interface"]
+    Ip2 = Router["network_interfaces"][1]["ip_address"]
+    Netmask2 = Router["network_interfaces"][1]["netmask"]
+    Interface2 = Router["network_interfaces"][1]["name_interface"]
+    EdgeReference2 = Router["network_interfaces"][1]["edge"]
+    UplinkBandwidth2 = 0
+    DownlinkBandwidth2 = 0
+    for edge in edges:
+      if EdgeReference2[0] == edge["from"] and EdgeReference2[1] == edge["to"]:
+        UplinkBandwidth2 = edge["bandwidth_up"]
+        DownlinkBandwidth2 = edge["bandwidth_down"]
     IpNoSub2 = Ip2.split("/")[0]
     NetmaskAbbr2 = Ip2.split("/")[1]
 
-    Ip3 = Router[1]["Network"][2]["Ip"]
-    Netmask3 = Router[1]["Network"][2]["Netmask"]
-    Interface3 = Router[1]["Network"][2]["Interface"]
+    Ip3 = Router["network_interfaces"][2]["ip_address"]
+    Netmask3 = Router["network_interfaces"][2]["netmask"]
+    Interface3 = Router["network_interfaces"][2]["name_interface"]
+    EdgeReference3 = Router["network_interfaces"][2]["edge"]
+    UplinkBandwidth3 = 0
+    DownlinkBandwidth3 = 0
+    for edge in edges:
+      if EdgeReference3[0] == edge["from"] and EdgeReference3[1] == edge["to"]:
+        UplinkBandwidth3 = edge["bandwidth_up"]
+        DownlinkBandwidth3 = edge["bandwidth_down"]
     IpNoSub3 = Ip3.split("/")[0]
     NetmaskAbbr3 = Ip3.split("/")[1]
     
@@ -202,6 +275,7 @@ def writeRouter(f,Router):
     for x in Network3:
       Gateway3 = str(x)     
 
+    CustumScript = Db["custom_script"]
 
 
     f.write("config.vm.define \""+ Name +"\" do |" + Name + "|\n")
@@ -243,6 +317,29 @@ def writeRouter(f,Router):
     f.write("ip forwarding\n")
     f.write("exit'\n")
 
+    if UplinkBandwidth1 > 0 or DownlinkBandwidth1 > 0:
+      f.write('sudo ./wondershaper -a ' + Interface1)
+      if DownlinkBandwidth1 > 0:
+        f.write(' -d ' + str(DownlinkBandwidth1))
+      if UplinkBandwidth1 > 0:
+        f.write(' -u ' + str(UplinkBandwidth1))
+      f.write('\n')
+
+    if UplinkBandwidth2 > 0 or DownlinkBandwidth2 > 0:
+      f.write('sudo ./wondershaper -a ' + Interface2)
+      if DownlinkBandwidth2 > 0:
+        f.write(' -d ' + str(DownlinkBandwidth2))
+      if UplinkBandwidth2 > 0:
+        f.write(' -u ' + str(UplinkBandwidth2))
+      f.write('\n')
+    
+    if UplinkBandwidth3 > 0 or DownlinkBandwidth3 > 0:
+      f.write('sudo ./wondershaper -a ' + Interface3)
+      if DownlinkBandwidth3 > 0:
+        f.write(' -d ' + str(DownlinkBandwidth3))
+      if UplinkBandwidth3 > 0:
+        f.write(' -u ' + str(UplinkBandwidth3))
+      f.write('\n')
     #here there is the custum script
     f.write(CustumScript + " \n")
 
@@ -255,7 +352,7 @@ def writeRouter(f,Router):
     f.write("end\n")
 
 
-
+"""
 #the following is a fake graph that i used for testing
 #instead of typing everytime the input in the command line
 host1 = (1,{
@@ -374,9 +471,10 @@ def remap(newList):
              device[1]["Network"][0]["Interface"] = item["network_interfaces"][0]["name_interface"]
 
     return MyNet
+"""
 
-def html_to_vagrantfile(Network):
-    VagrantFile = open("VagrantfileMYSQL", "w")
+def html_to_vagrantfile(nodes, edges):
+    VagrantFile = open("Vagrantfile", "w")
 
     #read the data structure from input
     #Network = G.nodes.data():

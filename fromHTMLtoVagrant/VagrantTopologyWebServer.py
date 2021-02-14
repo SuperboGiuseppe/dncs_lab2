@@ -11,12 +11,14 @@ def BeginVagrantFile(f):
     f.write('# Configure web server machine\n')
 
 
-def writeWebServer(f,Web, edges):
+def writeWebServer(f, Web, edges):
 
     Id = Web["id"]
     Name = Web["label"]
     Os  = Web["vm_image"]
     Ip = Web["network_interfaces"][0]["ip_address"]
+    Ram = Web["ram"]
+    N_Cpus = Web["n_cpus"]
     InterfaceName = Web["network_interfaces"][0]["name_interface"]
     EdgeReference = Web["network_interfaces"][0]["edge"]
     UplinkBandwidth = 0
@@ -38,12 +40,12 @@ def writeWebServer(f,Web, edges):
     f.write('sudo apt-get install -y nginx\n')
     f.write('touch /var/www/html/index.php\n')
     f.write('sudo apt-get install -y php-fpm php-mysql\n')
-    f.write('sudo apt install wondershaper \n')
-    f.write('sudo systemctl enable wondershaper.service \n')
-    f.write('sudo systemctl start wondershaper.service \n')
+    f.write('cd /home/vagrant\n')
+    f.write('git clone https://github.com/magnific0/wondershaper.git\n')
+    f.write('cd wondershaper\n')
     for edge in edges:
       if UplinkBandwidth > 0 or DownlinkBandwidth > 0:
-        f.write('sudo wondershaper -a ' + InterfaceName)
+        f.write('sudo ./wondershaper -a ' + InterfaceName)
         if DownlinkBandwidth > 0:
           f.write(' -d ' + str(DownlinkBandwidth))
         if UplinkBandwidth > 0:
@@ -54,16 +56,21 @@ def writeWebServer(f,Web, edges):
 
     f.write('echo "Provision web server complete"\n')
     f.write('SHELL\n')
+    f.write(Name + '.vm.provider "virtualbox" do |vb|\n')
+    f.write('vb.memory = ' + str(Ram) + '\n')
+    f.write('vb.cpus = ' + str(N_Cpus) + '\n')
+    f.write('end\n')
     f.write('end\n')
 
 
-
-def writeDatabase(f,Db, edges):
+def writeDatabase(f, Db, edges):
 
     Id = Db["id"]
     Name = Db["label"]
     Os  = Db["vm_image"]
     Ip = Db["network_interfaces"][0]["ip_address"]
+    Ram = Db["ram"]
+    N_Cpus = Db["n_cpus"]
     InterfaceName = Db["network_interfaces"][0]["name_interface"]
     EdgeReference = Db["network_interfaces"][0]["edge"]
     UplinkBandwidth = 0
@@ -77,29 +84,37 @@ def writeDatabase(f,Db, edges):
     f.write('# Configure database server machine\n')
     f.write('config.vm.define \"' + Name + '\" do |' + Name + '|\n')
     f.write(Name + '.vm.box = \"' + Os + '\"\n')
-    f.write(Name + '.vm.hostname = "' + Name + '"\n')
+    f.write(Name + '.vm.hostname = \"' + Name + '\"\n')
     f.write(Name + '.vm.network "private_network", ip: \"' + Ip + '\" \n')
 
     f.write(Name + '.vm.provision "shell", run: "always", inline: <<-SHELL\n')
-    f.write('sudo apt update')
-    f.write('sudo apt install mysql-server \n')
-    f.write('sudo apt install wondershaper \n')
-    f.write('sudo systemctl enable wondershaper.service \n')
-    f.write('sudo systemctl start wondershaper.service \n')
+    f.write('sudo apt update\n')
+    f.write('sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install mysql-server\n')
+    f.write('echo \"WARNING: It is necessary to set the root password of mysql-server before using it!!!\"\n')
+    f.write('echo \"Example password configuration: mysqladmin -u root password mysecretpasswordgoeshere\"\n')
+    f.write('sleep 10\n')
+    f.write('cd /home/vagrant\n')
+    f.write('git clone https://github.com/magnific0/wondershaper.git\n')
+    f.write('cd wondershaper\n')
     for edge in edges:
       if UplinkBandwidth > 0 or DownlinkBandwidth > 0:
-        f.write('sudo wondershaper -a ' + InterfaceName)
+        f.write('sudo ./wondershaper -a ' + InterfaceName)
         if DownlinkBandwidth > 0:
           f.write(' -d ' + str(DownlinkBandwidth))
         if UplinkBandwidth > 0:
           f.write(' -u ' + str(UplinkBandwidth))
         f.write('\n')
+
     #here there is the custum script
     f.write(CustumScript + " \n")
+    f.write('echo "Provision database server complete"\n')
     f.write('SHELL\n')
+    f.write(Name + '.vm.provider "virtualbox" do |vb|\n')
+    f.write('vb.memory = ' + str(Ram) + '\n')
+    f.write('vb.cpus = ' + str(N_Cpus) + '\n')
     f.write('end\n')
     f.write('end\n')
-
+ 
 """
 web1 = (1,{
   "Id" : 1,
@@ -188,7 +203,7 @@ def remap(newList):
 """
 
 def html_to_vagrantfile(nodes, edges):
-    VagrantFile = open("VagrantfileWEBSERVER", "w")
+    VagrantFile = open("Vagrantfile", "w")
 
     #read the data structure from input
     #Network = G.nodes.data():
@@ -211,6 +226,6 @@ def html_to_vagrantfile(nodes, edges):
         writeWebServer(VagrantFile, node, edges)
       if node["type"] == "db":
         writeDatabase(VagrantFile, node, edges)
-    
+    VagrantFile.write('end\n')
     VagrantFile.close()
 
