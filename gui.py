@@ -287,7 +287,7 @@ class network_design_window(QtWidgets.QMainWindow):
         print(self.current_network_template)
         vagrantConverterCollector.converter_selector(self.current_network_path, self.current_network_template)
         self.debug_console_textedit.clear()
-        #self.vagrant_process.start('vagrant up')
+        self.vagrant_process.start('vagrant status')
         self.button_vagrant.setDisabled(True)
         self.button_dashboard.setEnabled(True)
         self.button_destroy.setEnabled(True)

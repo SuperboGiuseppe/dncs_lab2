@@ -97,23 +97,23 @@ def writeHost(f, Host, edges, network):
     IpNet12 = str(Network12.network())
     """
 
-    if Id is 4:
+    if Id == 4:
       Gateway = IpSwitch_1.split("/")[0]
 
-    if Id is 5:
+    if Id == 5:
       Gateway = IpSwitch_2.split("/")[0]
 
-    if Id is 6:
+    if Id == 6:
       Gateway = IpRouter2.split("/")[0]
 
     f.write("config.vm.define \"" + Name + "\" do |" + Name + "|\n")
     f.write(Name + ".vm.box = \"" + Os +"\"\n")
     f.write(Name + ".vm.hostname = \"" + Name + "\"\n")
-    if Id is 4:
+    if Id == 4:
       f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub + "\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_host_" + Name + "\", auto_config: true\n")
-    if Id is 5:
+    if Id == 5:
       f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub + "\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_host_" + Name + "\", auto_config: true\n")
-    if Id is 6:
+    if Id == 6:
       f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub + "\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_router-south-2\", auto_config: true\n") 
     
     f.write(Name + ".vm.provision \"shell\", run: \"always\", inline: <<-SHELL\n")
@@ -124,11 +124,11 @@ def writeHost(f, Host, edges, network):
     f.write("sudo route add -net " + IpNetRouter1_1 + " netmask " + NetmaskRouter1_1 + " gw " + Gateway + " dev " + Interface + "\n")
     f.write("sudo route add -net " + IpNetRouter1_2 + " netmask " + NetmaskRouter1_2 + " gw " + Gateway + " dev " + Interface + "\n")  
 
-    if Id is 4: 
+    if Id == 4: 
       f.write("sudo route add -net "+ IpNetSwitch_2 + " netmask " + NetmaskSwitch_2 + " gw " + Gateway + " dev " + Interface + "\n")
-    if Id is 5:
+    if Id == 5:
       f.write("sudo route add -net " + IpNetSwitch_1 + " netmask " + NetmaskSwitch_1 + " gw " + Gateway + " dev " + Interface + "\n")
-    if Id is 6: 
+    if Id == 6: 
       f.write("sudo route add -net " + IpNetSwitch_1 + " netmask " + NetmaskSwitch_1 + " gw " + Gateway + " dev " + Interface + "\n")
       f.write("sudo route add -net " + IpNetSwitch_2 + " netmask " + NetmaskSwitch_2 + " gw " + Gateway + " dev " + Interface + "\n")
     
@@ -146,7 +146,7 @@ def writeHost(f, Host, edges, network):
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write("SHELL\n")
-    if Id is 4:
+    if Id == 4:
       f.write(Name + ".vm.provision \"shell\", inline: <<-SHELL\n")
       f.write("echo \"Installation of Web-Server\"\n")
       f.write("sudo apt-get update\n")
@@ -199,9 +199,9 @@ def writeRouter(f, Router, edges, network):
 
     CustomScript = Router["custom_script"]
 
-    if Id is 1: 
+    if Id == 1: 
       tag = "1"
-    if Id is 2: 
+    if Id == 2: 
       tag = "2"  
 
     IpRouter2 = network[1]["network_interfaces"][0]["ip_address"]
@@ -269,11 +269,11 @@ def writeRouter(f, Router, edges, network):
     f.write("echo \"Static Routig configuration Started\"\n")
     f.write("sudo sysctl -w net.ipv4.ip_forward=1\n")
 
-    if Id is 1: 
+    if Id == 1: 
       f.write("sudo route add -net " + IpRouter2 + " netmask " + NetmaskRouter2 + " gw " + GatewayRouter2 + " dev " + Interface2 + "\n")
       f.write("sudo route add -net " + IpSwitch_1 + " netmask " + NetmaskSwitch_1 + " gw " + GatewaySwitch + " dev " + Interface1 + "\n")
       f.write("sudo route add -net " + IpSwitch_2 + " netmask " + NetmaskSwitch_2 + " gw " + GatewaySwitch + " dev " + Interface1 + "\n")
-    if Id is 2: 
+    if Id == 2: 
       f.write("sudo route add -net " + IpRouter1_1 + " netmask " + NetmaskRouter1_1 + " gw " + GatewayRouter1 + " dev " + Interface2 + "\n")
       f.write("sudo route add -net " + IpSwitch_1 + " netmask " + NetmaskSwitch_1 + " gw " + GatewayRouter1 + " dev " + Interface2 + "\n")
       f.write("sudo route add -net " + IpSwitch_2 + " netmask " + NetmaskSwitch_2 + " gw " + GatewayRouter1 + " dev " + Interface2 + "\n")
@@ -564,7 +564,7 @@ def html_to_vagrantfile(nodes, edges):
         writeSwitch(VagrantFile, node, edges, nodes)
       if node["type"] == "host":
         writeHost(VagrantFile, node, edges, nodes)        
-    
+    VagrantFile.write('end\n')
     VagrantFile.close()
 
 

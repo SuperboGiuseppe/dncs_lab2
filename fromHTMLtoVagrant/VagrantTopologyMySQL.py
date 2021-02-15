@@ -143,9 +143,9 @@ def writeWebServer(f, Web, edges):
     f.write('doc.pull_images "php"\n')
     f.write('doc.run "nginx"\n')
     f.write('doc.run "php"\n')
+    f.write('end\n')
     f.write(Name + '.vm.provider "virtualbox" do |vb|\n')
     f.write("vb.memory = " + Ram + "\n")
-    f.write('end\n')
     f.write('end\n')
     f.write('end\n')
 
@@ -202,11 +202,10 @@ def writeDatabase(f, Db, edges):
     f.write(Name + '.vm.provision "docker" do |doc|\n')
     f.write('doc.pull_images "mysql"\n')
     f.write('doc.run "mysql"\n')
+    f.write('end\n')
     f.write(Name + '.vm.provider "virtualbox" do |vb|\n')
     f.write('vb.memory = ' + str(Ram) +'\n')
     f.write('vb.cpus = ' + str(N_Cpus) + '\n')
-    f.write('end\n')
-    f.write('end\n')
     f.write('end\n')
     f.write('end\n')
 
@@ -278,7 +277,7 @@ def writeRouter(f, Router, edges):
     for x in Network3:
       Gateway3 = str(x)     
 
-    CustumScript = Db["custom_script"]
+    CustumScript = Router["custom_script"]
 
 
     f.write("config.vm.define \""+ Name +"\" do |" + Name + "|\n")
@@ -496,31 +495,14 @@ def html_to_vagrantfile(nodes, edges):
 
     BeginVagrantFile(VagrantFile)
 
-    for device in Network: 
-        typeOfDevice = device[1]["Type"]
-
-        if typeOfDevice is "Router":
-            writeRouter(VagrantFile,device)
-
-
-    for device in Network:
-        typeOfDevice = device[1]["Type"]
-
-        if typeOfDevice is "Host":
-            writeHost(VagrantFile,device)
-
-    #new devices
-    for device in Network:
-        typeOfDevice = device[1]["Type"]
-
-        if typeOfDevice is "Web":
-            writeWebServer(VagrantFile,device)
-
-    for device in Network:
-        typeOfDevice = device[1]["Type"]
-
-        if typeOfDevice is "Db":
-            writeDatabase(VagrantFile,device)
-
-    #VagrantFile.write("end\n")
+    for node in nodes: 
+      if node["type"] == "router":
+        writeRouter(VagrantFile, node, edges)
+      if node["type"] == "host":
+        writeHost(VagrantFile, node, edges)
+      if node["type"] == "Web":
+        writeWebServer(VagrantFile, node, edges)
+      if node["type"] == "Db":
+        writeDatabase(VagrantFile, node, edges)
+    VagrantFile.write("end\n")
     VagrantFile.close()
