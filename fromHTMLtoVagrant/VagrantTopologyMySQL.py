@@ -154,6 +154,8 @@ def writeDatabase(f, Db, edges):
     Id = Db["id"]
     Name = Db["label"]
     Os  = Db["vm_image"]
+    Ram = Db["ram"]
+    N_Cpus = Db["n_cpus"]
 
     Ip = Db["network_interfaces"][0]["ip_address"]
     Netmask = Db["network_interfaces"][0]["netmask"]
@@ -201,7 +203,8 @@ def writeDatabase(f, Db, edges):
     f.write('doc.pull_images "mysql"\n')
     f.write('doc.run "mysql"\n')
     f.write(Name + '.vm.provider "virtualbox" do |vb|\n')
-    f.write('vb.memory = ' + Ram +'\n')
+    f.write('vb.memory = ' + str(Ram) +'\n')
+    f.write('vb.cpus = ' + str(N_Cpus) + '\n')
     f.write('end\n')
     f.write('end\n')
     f.write('end\n')
@@ -347,7 +350,8 @@ def writeRouter(f, Router, edges):
     f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write("SHELL\n")
     f.write(Name + ".vm.provider \"virtualbox\" do |vb|\n")
-    f.write("vb.memory = " + Ram + "\n")
+    f.write("vb.memory = " + str(Ram) + "\n")
+    f.write('vb.cpus =' + str(N_Cpus) + "\n")
     f.write("end\n")
     f.write("end\n")
 

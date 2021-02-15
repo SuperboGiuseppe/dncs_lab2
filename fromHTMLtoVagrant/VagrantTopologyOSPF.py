@@ -63,24 +63,24 @@ def writeHost(f,Host, edges):
     f.write("echo \"Static Routig configuration Started for " + Name + "\"\n")
     f.write("sudo sysctl -w net.ipv4.ip_forward=1\n")
     f.write("sudo route add -net " + str(IpNet) + " netmask " + Netmask + " gw " + Gateway + " dev " + Interface + "\n")
-    f.write(CustumScript + " \n")#here there is the custum script
-    f.write("echo \"Configuration END\"\n")
-    f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write('cd /home/vagrant\n')
     f.write('git clone https://github.com/magnific0/wondershaper.git\n')
     f.write('cd wondershaper\n')
-    for edge in edges:
-      if UplinkBandwidth > 0 or DownlinkBandwidth > 0:
-        f.write('sudo ./wondershaper -a ' + Interface)
-        if DownlinkBandwidth > 0:
-          f.write(' -d ' + str(DownlinkBandwidth))
-        if UplinkBandwidth > 0:
-          f.write(' -u ' + str(UplinkBandwidth))
-        f.write('\n')
+    if UplinkBandwidth > 0 or DownlinkBandwidth > 0:
+      f.write('sudo ./wondershaper -a ' + Interface)
+      if DownlinkBandwidth > 0:
+        f.write(' -d ' + str(DownlinkBandwidth))
+      if UplinkBandwidth > 0:
+        f.write(' -u ' + str(UplinkBandwidth))
+      f.write('\n')
+    f.write(CustumScript + " \n")#here there is the custum script
+    f.write("echo \"Configuration END\"\n")
+    f.write("echo \"" + Name + " is ready to Use\"\n")
+
     f.write("SHELL\n")
     f.write(Name + ".vm.provider \"virtualbox\" do |vb|\n")
-    f.write("vb.memory = " + Ram + "\n")
-    f.write("vb.cpus = " + N_Cpus + "\n")
+    f.write("vb.memory = " + str(Ram) + "\n")
+    f.write("vb.cpus = " + str(N_Cpus) + "\n")
     f.write("end\n")
     f.write("end\n")
 
@@ -148,7 +148,9 @@ def writeRouter(f,Router, edges):
     Network3 = ipcalc.Network(Ip3)
     IpNet3 = Network3.network()
     for x in Network3:
-      Gateway3 = str(x)     
+      Gateway3 = str(x)   
+
+    CustomScript = Router["custom_script"]  
 
     f.write("config.vm.define \""+ Name +"\" do |" + Name + "|\n")
     f.write(Name + ".vm.box = \"" + Os + "\"\n")
@@ -202,7 +204,10 @@ def writeRouter(f,Router, edges):
     f.write("exit\n")
     f.write("ip forwarding\n")
     f.write("exit'\n")
-    
+
+    f.write('cd /home/vagrant\n')
+    f.write('git clone https://github.com/magnific0/wondershaper.git\n')
+    f.write('cd wondershaper\n')
     if UplinkBandwidth1 > 0 or DownlinkBandwidth1 > 0:
       f.write('sudo ./wondershaper -a ' + Interface1)
       if DownlinkBandwidth1 > 0:
@@ -232,12 +237,14 @@ def writeRouter(f,Router, edges):
     f.write("SHELL\n")
     f.write("# " + Name + ".vm.provision \"shell\", path: \"common.sh\"\n")
     f.write(Name + ".vm.provider \"virtualbox\" do |vb|\n")
-    f.write("vb.memory = " + Ram + "\n")
+    f.write("vb.memory = " + str(Ram) + "\n")
+    f.write("vb.cpus = " + str(N_Cpus) + "\n")
     f.write("end\n")
     f.write("end\n")
 
 
 
+"""
 #the following is a fake graph that i used for testing
 #instead of typing everytime the input in the command line
 host1 = (4,{
@@ -388,6 +395,7 @@ def remap(newList):
              device[1]["Network"][0]["Interface"] = item["network_interfaces"][0]["name_interface"]
 
     return MyNet
+"""
 
 def html_to_vagrantfile(listOfDevice):
     VagrantFile = open("VagrantfileOSPF", "w")

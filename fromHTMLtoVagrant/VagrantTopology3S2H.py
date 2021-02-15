@@ -16,29 +16,53 @@ def BeginVagrantFile(f):
     f.write('end\n')
 
 #this function writes a server in vagrant file
-def writeServer(f,Server,Topology):
+def writeServer(f, Server, edges, network):
+    
+    Id = Server["id"]
+    Name = Server["label"]
+    Os  = Server["vm_image"]
+    Ram = Server["ram"]
+    N_Cpus = Server["n_cpus"]
+    CustumScript = Server["custom_script"]
 
-    Id = Server[1]["Id"]
-    Name = Server[1]["Name"]
-    Ram = Server[1]["Ram"]
-    Os  = Server[1]["Os"]
-    CustumScript = Server[1]["custom_script"]
 
-    Ip1 = Server[1]["Network"][0]["Ip"]
-    Netmask1 = Server[1]["Network"][0]["Netmask"]
-    Interface1 = Server[1]["Network"][0]["Interface"]
+    Ip1 = Server["network_interfaces"][0]["ip_address"]
+    Netmask1 = Server["network_interfaces"][0]["netmask"]
+    Interface1 = Server["network_interfaces"][0]["name_interface"]
+    EdgeReference1 = Server["network_interfaces"][0]["edge"]
+    UplinkBandwidth1 = 0
+    DownlinkBandwidth1 = 0
+    for edge in edges:
+      if EdgeReference1[0] == edge["from"] and EdgeReference1[1] == edge["to"]:
+        UplinkBandwidth1 = edge["bandwidth_up"]
+        DownlinkBandwidth1 = edge["bandwidth_down"]
     IpNoSub1 = Ip1.split("/")[0]
+    NetmaskAbbr1 = Ip1.split("/")[1]
 
-    Ip2 = Server[1]["Network"][1]["Ip"]
-    Netmask2 = Server[1]["Network"][1]["Netmask"]
-    Interface2 = Server[1]["Network"][1]["Interface"]
+    Ip2 = Server["network_interfaces"][1]["ip_address"]
+    Netmask2 = Server["network_interfaces"][1]["netmask"]
+    Interface2 = Server["network_interfaces"][1]["name_interface"]
+    EdgeReference2 = Server["network_interfaces"][1]["edge"]
+    UplinkBandwidth2 = 0
+    DownlinkBandwidth2 = 0
+    for edge in edges:
+      if EdgeReference2[0] == edge["from"] and EdgeReference2[1] == edge["to"]:
+        UplinkBandwidth2 = edge["bandwidth_up"]
+        DownlinkBandwidth2 = edge["bandwidth_down"]
     IpNoSub2 = Ip2.split("/")[0]
+    NetmaskAbbr2 = Ip2.split("/")[1]
+
 
     if Id is 4: 
       tag = "1"
     if Id is 5: 
       tag = "2"  
 
+
+    IpRouter2 = network[4]["network_interfaces"][0]["ip_address"]
+    NetmaskRouter2 = network[4]["network_interfaces"][0]["netmask"]
+    NetworkRouter2 = ipcalc.Network(IpRouter2)
+    IpNetRouter2 = str(NetworkRouter2.network())
     Ip2 = Topology[4][1]["Network"][0]["Ip"]
     Mask2 = Topology[4][1]["Network"][0]["Netmask"]
     Network2 = ipcalc.Network(Ip2)
@@ -280,28 +304,6 @@ def writeSwitch(f,Switch,Topology):
 
 
 
-"""
-web1 = (1,{
-  "Id" : 1,
-  "Name":"web1",
-  "Os": "ubuntu/xenial64",
-  "Ip": "10.0.0.50",
-  "custom_script":"echo 'THIS IS CUSTUM SCRIPT'"
-})
-
-db1 = (2,{
-  "Id" : 2,
-  "Name":"db1",
-  "Os": "ubuntu/xenial64",
-  "Ip": "10.0.0.51",
-  "custom_script":"echo 'THIS IS CUSTUM SCRIPT'"
-})
-
-
-MyNet = [web1,db1]
-"""
-
-
 def html_to_vagrantfile(nodes, edges):
     VagrantFile = open("Vagrantfile3SERVERS2HOST", "w")
 
@@ -323,9 +325,9 @@ def html_to_vagrantfile(nodes, edges):
     BeginVagrantFile(VagrantFile)
     for node in nodes:
       if node["type"] == "web":
-        writeWebServer(VagrantFile, node, edges)
+        writeWebServer(VagrantFile, node, edges, nodes)
       if node["type"] == "db":
-        writeDatabase(VagrantFile, node, edges)
+        writeDatabase(VagrantFile, node, edges, nodes)
     
     VagrantFile.close()
 
