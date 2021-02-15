@@ -42,15 +42,14 @@ def writeWebServer(f, Web, edges):
     f.write('sudo apt-get install -y php-fpm php-mysql\n')
     f.write('cd /home/vagrant\n')
     f.write('git clone https://github.com/magnific0/wondershaper.git\n')
-    f.write('cd wondershaper\n')
-    for edge in edges:
-      if UplinkBandwidth > 0 or DownlinkBandwidth > 0:
-        f.write('sudo ./wondershaper -a ' + InterfaceName)
-        if DownlinkBandwidth > 0:
-          f.write(' -d ' + str(DownlinkBandwidth))
-        if UplinkBandwidth > 0:
-          f.write(' -u ' + str(UplinkBandwidth))
-        f.write('\n')
+    if UplinkBandwidth > 0 or DownlinkBandwidth > 0:
+      f.write('cd wondershaper\n')
+      f.write('sudo ./wondershaper -a ' + InterfaceName)
+      if DownlinkBandwidth > 0:
+        f.write(' -d ' + str(DownlinkBandwidth))
+      if UplinkBandwidth > 0:
+        f.write(' -u ' + str(UplinkBandwidth))
+      f.write('\n')
     #here there is the custum script
     f.write(CustumScript + " \n")
 
@@ -95,15 +94,14 @@ def writeDatabase(f, Db, edges):
     f.write('sleep 10\n')
     f.write('cd /home/vagrant\n')
     f.write('git clone https://github.com/magnific0/wondershaper.git\n')
-    f.write('cd wondershaper\n')
-    for edge in edges:
-      if UplinkBandwidth > 0 or DownlinkBandwidth > 0:
-        f.write('sudo ./wondershaper -a ' + InterfaceName)
-        if DownlinkBandwidth > 0:
-          f.write(' -d ' + str(DownlinkBandwidth))
-        if UplinkBandwidth > 0:
-          f.write(' -u ' + str(UplinkBandwidth))
-        f.write('\n')
+    if UplinkBandwidth > 0 or DownlinkBandwidth > 0:
+      f.write('cd wondershaper\n')
+      f.write('sudo ./wondershaper -a ' + InterfaceName)
+      if DownlinkBandwidth > 0:
+        f.write(' -d ' + str(DownlinkBandwidth))
+      if UplinkBandwidth > 0:
+        f.write(' -u ' + str(UplinkBandwidth))
+      f.write('\n')
 
     #here there is the custum script
     f.write(CustumScript + " \n")

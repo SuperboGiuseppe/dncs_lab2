@@ -1,7 +1,7 @@
 import ipcalc 
 
 #this function writes the beginning of the VagrantFile
-def BeginVagrantFile(f,Network):
+def BeginVagrantFile(f):
     print("writing the beginning of the vagrant file")
     f.write("# -*- mode: ruby -*- \n# vi: set ft=ruby :\n\n")
     f.write("#All Vagrant configuration is done below. The 2 in Vagrant.configure\n#configures the configuration version we support older styles for\n#backwards compatibility. Please don't change it unless you know what\n#you're doing.\n")
@@ -22,7 +22,7 @@ def BeginVagrantFile(f,Network):
 def writeHost(f, Host, edges, network):
 
     Id = Host["id"]
-    Name = Host["name"]
+    Name = Host["label"]
     Os  = Host["vm_image"]
     Ram = Host["ram"]
     N_Cpus = Host["n_cpus"]
@@ -42,69 +42,78 @@ def writeHost(f, Host, edges, network):
     IpNet = Network.network()
 
 
-    IpRouter2 = network[4]["network_interfaces"][0]["ip_address"]
-    NetmaskRouter2 = network[4]["network_interfaces"][0]["netmask"]
+    IpRouter2 = network[1]["network_interfaces"][0]["ip_address"]
+    NetmaskRouter2 = network[1]["network_interfaces"][0]["netmask"]
     NetworkRouter2 = ipcalc.Network(IpRouter2)
     IpNetRouter2 = str(NetworkRouter2.network())
+    """
     Ip2 = Topology[4][1]["Network"][0]["Ip"]
     Mask2 = Topology[4][1]["Network"][0]["Netmask"]
     Network2 = ipcalc.Network(Ip2)
     IpNet2 = str(Network2.network())
+    """
 
-
-    IpRouter1_1 = network[3]["network_interfaces"][0]["ip_address"]
-    NetmaskRouter1_1 = network[3]["network_interfaces"][0]["netmask"]
+    IpRouter1_1 = network[0]["network_interfaces"][0]["ip_address"]
+    NetmaskRouter1_1 = network[0]["network_interfaces"][0]["netmask"]
     NetworkRouter1_1 = ipcalc.Network(IpRouter1_1)
     IpNetRouter1_1 = str(NetworkRouter1_1.network())
+    """
     Ip3 = Topology[3][1]["Network"][0]["Ip"]
     Mask3 = Topology[3][1]["Network"][0]["Netmask"]
     Network3 = ipcalc.Network(Ip3)
     IpNet3 = str(Network3.network())
+    """
 
-    IpRouter1_2 = network[3]["network_interfaces"][1]["ip_address"]
-    NetmaskRouter1_2 = network[3]["network_interfaces"][1]["netmask"]
+    IpRouter1_2 = network[0]["network_interfaces"][1]["ip_address"]
+    NetmaskRouter1_2 = network[0]["network_interfaces"][1]["netmask"]
     NetworkRouter1_2 = ipcalc.Network(IpRouter1_2)
     IpNetRouter1_2 = str(NetworkRouter1_2.network())
+    """
     Ip4 = Topology[3][1]["Network"][1]["Ip"]
     Mask4 = Topology[3][1]["Network"][1]["Netmask"]
     Network4 = ipcalc.Network(Ip4)
     IpNet4 = str(Network4.network())
+    """
 
-    IpSwitch_1 = network[5]["network_interfaces"][0]["ip_address"]
-    NetmaskSwitch_1 = network[5]["network_interfaces"][0]["netmask"]
+    IpSwitch_1 = network[2]["network_interfaces"][0]["ip_address"]
+    NetmaskSwitch_1 = network[2]["network_interfaces"][0]["netmask"]
     NetworkSwitch_1 = ipcalc.Network(IpSwitch_1)
     IpNetSwitch_1 = str(NetworkSwitch_1.network())
+    """
     Ip8 = Topology[5][1]["Network"][0]["Ip"]
     Mask8 = Topology[5][1]["Network"][0]["Netmask"]
     Network8 = ipcalc.Network(Ip8)
     IpNet8 = str(Network8.network())
+    """
 
-    IpSwitch_2 = network[5]["network_interfaces"][1]["ip_address"]
-    NetmaskSwitch_2 = network[5]["network_interfaces"][1]["netmask"]
+    IpSwitch_2 = network[2]["network_interfaces"][1]["ip_address"]
+    NetmaskSwitch_2 = network[2]["network_interfaces"][1]["netmask"]
     NetworkSwitch_2 = ipcalc.Network(IpSwitch_2)
     IpNetSwitch_2 = str(NetworkSwitch_2.network())
+    """
     Ip12 = Topology[5][1]["Network"][1]["Ip"]
     Mask12 = Topology[5][1]["Network"][1]["Netmask"]
     Network12 = ipcalc.Network(Ip12)
     IpNet12 = str(Network12.network())
+    """
 
-    if Id is 1:
+    if Id is 4:
       Gateway = IpSwitch_1.split("/")[0]
 
-    if Id is 2:
+    if Id is 5:
       Gateway = IpSwitch_2.split("/")[0]
 
-    if Id is 3:
+    if Id is 6:
       Gateway = IpRouter2.split("/")[0]
 
     f.write("config.vm.define \"" + Name + "\" do |" + Name + "|\n")
     f.write(Name + ".vm.box = \"" + Os +"\"\n")
     f.write(Name + ".vm.hostname = \"" + Name + "\"\n")
-    if Id is 1:
+    if Id is 4:
       f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub + "\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_host_" + Name + "\", auto_config: true\n")
-    if Id is 2:
+    if Id is 5:
       f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub + "\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_host_" + Name + "\", auto_config: true\n")
-    if Id is 3:
+    if Id is 6:
       f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub + "\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_router-south-2\", auto_config: true\n") 
     
     f.write(Name + ".vm.provision \"shell\", run: \"always\", inline: <<-SHELL\n")
@@ -115,11 +124,11 @@ def writeHost(f, Host, edges, network):
     f.write("sudo route add -net " + IpNetRouter1_1 + " netmask " + NetmaskRouter1_1 + " gw " + Gateway + " dev " + Interface + "\n")
     f.write("sudo route add -net " + IpNetRouter1_2 + " netmask " + NetmaskRouter1_2 + " gw " + Gateway + " dev " + Interface + "\n")  
 
-    if Id is 1: 
+    if Id is 4: 
       f.write("sudo route add -net "+ IpNetSwitch_2 + " netmask " + NetmaskSwitch_2 + " gw " + Gateway + " dev " + Interface + "\n")
-    if Id is 2:
+    if Id is 5:
       f.write("sudo route add -net " + IpNetSwitch_1 + " netmask " + NetmaskSwitch_1 + " gw " + Gateway + " dev " + Interface + "\n")
-    if Id is 3: 
+    if Id is 6: 
       f.write("sudo route add -net " + IpNetSwitch_1 + " netmask " + NetmaskSwitch_1 + " gw " + Gateway + " dev " + Interface + "\n")
       f.write("sudo route add -net " + IpNetSwitch_2 + " netmask " + NetmaskSwitch_2 + " gw " + Gateway + " dev " + Interface + "\n")
     
@@ -137,7 +146,7 @@ def writeHost(f, Host, edges, network):
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write("SHELL\n")
-    if Id is 3:
+    if Id is 4:
       f.write(Name + ".vm.provision \"shell\", inline: <<-SHELL\n")
       f.write("echo \"Installation of Web-Server\"\n")
       f.write("sudo apt-get update\n")
@@ -190,54 +199,64 @@ def writeRouter(f, Router, edges, network):
 
     CustomScript = Router["custom_script"]
 
-    if Id is 4: 
+    if Id is 1: 
       tag = "1"
-    if Id is 5: 
+    if Id is 2: 
       tag = "2"  
 
-    IpRouter2 = network[4]["network_interfaces"][0]["ip_address"]
-    NetmaskRouter2 = network[4]["network_interfaces"][0]["netmask"]
+    IpRouter2 = network[1]["network_interfaces"][0]["ip_address"]
+    NetmaskRouter2 = network[1]["network_interfaces"][0]["netmask"]
     NetworkRouter2 = ipcalc.Network(IpRouter2)
     IpNetRouter2 = str(NetworkRouter2.network())
+    """
     Ip2 = Topology[4][1]["Network"][0]["Ip"]
     Mask2 = Topology[4][1]["Network"][0]["Netmask"]
     Network2 = ipcalc.Network(Ip2)
     IpNet2 = str(Network2.network())
+    """
 
-    IpRouter1_1 = network[3]["network_interfaces"][0]["ip_address"]
-    NetmaskRouter1_1 = network[3]["network_interfaces"][0]["netmask"]
+    IpRouter1_1 = network[0]["network_interfaces"][0]["ip_address"]
+    NetmaskRouter1_1 = network[0]["network_interfaces"][0]["netmask"]
     NetworkRouter1_1 = ipcalc.Network(IpRouter1_1)
     IpNetRouter1_1 = str(NetworkRouter1_1.network())
+    """
     Ip3 = Topology[5][1]["Network"][2]["Ip"]
     Mask3 = Topology[5][1]["Network"][2]["Netmask"]
     Network3 = ipcalc.Network(Ip3)
     IpNet3 = str(Network3.network())
+    """
 
-    IpSwitch_1 = network[5]["network_interfaces"][0]["ip_address"]
-    NetmaskSwitch_1 = network[5]["network_interfaces"][0]["netmask"]
+    IpSwitch_1 = network[2]["network_interfaces"][0]["ip_address"]
+    NetmaskSwitch_1 = network[2]["network_interfaces"][0]["netmask"]
     NetworkSwitch_1 = ipcalc.Network(IpSwitch_1)
     IpNetSwitch_1 = str(NetworkSwitch_1.network())
+    
+    """
     Ip8 = Topology[5][1]["Network"][0]["Ip"]
     Mask8 = Topology[5][1]["Network"][0]["Netmask"]
     Network8 = ipcalc.Network(Ip8)
     IpNet8 = str(Network8.network())
+    """
 
-    IpSwitch_2 = network[5]["network_interfaces"][1]["ip_address"]
-    NetmaskSwitch_2 = network[5]["network_interfaces"][1]["netmask"]
+    IpSwitch_2 = network[2]["network_interfaces"][1]["ip_address"]
+    NetmaskSwitch_2 = network[2]["network_interfaces"][1]["netmask"]
     NetworkSwitch_2 = ipcalc.Network(IpSwitch_2)
     IpNetSwitch_2 = str(NetworkSwitch_2.network())
+    
+    """
     Ip12 = Topology[5][1]["Network"][1]["Ip"]
     Mask12 = Topology[5][1]["Network"][1]["Netmask"]
     Network12 = ipcalc.Network(Ip12)
     IpNet12 = str(Network12.network())
+    """
 
-    GatewaySwitch = network[5]["network_interfaces"][2]["ip_address"]
+    GatewaySwitch = network[2]["network_interfaces"][2]["ip_address"]
     GatewaySwitch = GatewaySwitch.split("/")[0]
 
-    GatewayRouter1 = network[3]["network_interfaces"][1]["ip_address"]
+    GatewayRouter1 = network[0]["network_interfaces"][1]["ip_address"]
     GatewayRouter1 = GatewayRouter1.split("/")[0]
 
-    GatewayRouter2 = network[4]["network_interfaces"][1]["ip_address"]
+    GatewayRouter2 = network[1]["network_interfaces"][1]["ip_address"]
     GatewayRouter2 = GatewayRouter2.split("/")[0]
 
     f.write("config.vm.define \"" + Name+ "\" do |" + Name + "|\n")
@@ -250,11 +269,11 @@ def writeRouter(f, Router, edges, network):
     f.write("echo \"Static Routig configuration Started\"\n")
     f.write("sudo sysctl -w net.ipv4.ip_forward=1\n")
 
-    if Id is 4: 
+    if Id is 1: 
       f.write("sudo route add -net " + IpRouter2 + " netmask " + NetmaskRouter2 + " gw " + GatewayRouter2 + " dev " + Interface2 + "\n")
       f.write("sudo route add -net " + IpSwitch_1 + " netmask " + NetmaskSwitch_1 + " gw " + GatewaySwitch + " dev " + Interface1 + "\n")
       f.write("sudo route add -net " + IpSwitch_2 + " netmask " + NetmaskSwitch_2 + " gw " + GatewaySwitch + " dev " + Interface1 + "\n")
-    if Id is 5: 
+    if Id is 2: 
       f.write("sudo route add -net " + IpRouter1_1 + " netmask " + NetmaskRouter1_1 + " gw " + GatewayRouter1 + " dev " + Interface2 + "\n")
       f.write("sudo route add -net " + IpSwitch_1 + " netmask " + NetmaskSwitch_1 + " gw " + GatewayRouter1 + " dev " + Interface2 + "\n")
       f.write("sudo route add -net " + IpSwitch_2 + " netmask " + NetmaskSwitch_2 + " gw " + GatewayRouter1 + " dev " + Interface2 + "\n")
@@ -277,7 +296,7 @@ def writeRouter(f, Router, edges, network):
       if UplinkBandwidth2 > 0:
         f.write(' -u ' + str(UplinkBandwidth2))
       f.write('\n')
-    f.write(CustumScript + " \n") #here there is the custum script
+    f.write(CustomScript + " \n") #here there is the custum script
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write("SHELL\n")
@@ -329,26 +348,31 @@ def writeSwitch(f, Switch, edges, network):
         UplinkBandwidthSW = edge["bandwidth_up"]
         DownlinkBandwidthSW = edge["bandwidth_down"]
 
-    Gateway = network[3]["network_interfaces"][0]["ip:address"]
+    Gateway = network[0]["network_interfaces"][0]["ip_address"]
     Gateway = Gateway.split("/")[0]
 
-    IpRouter2 = network[4]["network_interfaces"][0]["ip_address"]
-    NetmaskRouter2 = network[4]["network_interfaces"][0]["netmask"]
+    IpRouter2 = network[1]["network_interfaces"][0]["ip_address"]
+    NetmaskRouter2 = network[1]["network_interfaces"][0]["netmask"]
     NetworkRouter2 = ipcalc.Network(IpRouter2)
     IpNetRouter2 = str(NetworkRouter2.network())
+    
+    """
     Ip2 = Topology[4][1]["Network"][0]["Ip"]
     Mask2 = Topology[4][1]["Network"][0]["Netmask"]
     Network2 = ipcalc.Network(Ip2)
     IpNet2 = str(Network2.network())
+    """
 
-    IpRouter1_2 = network[3]["network_interfaces"][1]["ip_address"]
-    NetmaskRouter1_2 = network[3]["network_interfaces"][1]["netmask"]
+    IpRouter1_2 = network[0]["network_interfaces"][1]["ip_address"]
+    NetmaskRouter1_2 = network[0]["network_interfaces"][1]["netmask"]
     NetworkRouter1_2 = ipcalc.Network(IpRouter1_2)
     IpNetRouter1_2 = str(NetworkRouter1_2.network())
+    """
     Ip4 = Topology[3][1]["Network"][1]["Ip"]
     Mask4 = Topology[3][1]["Network"][1]["Netmask"]
     Network4 = ipcalc.Network(Ip4)
     IpNet4 = str(Network4.network())
+    """
 
     f.write("config.vm.define \"" + Name + "\" do |" + Name + "|\n")
     f.write(Name + ".vm.box = \"" + Os +"\"\n")
@@ -427,7 +451,7 @@ def writeSwitch(f, Switch, edges, network):
 
 
 
-
+"""
 #the following is a fake graph that i used for testing
 #instead of typing everytime the input in the command line
 host1 = (1,{
@@ -527,9 +551,10 @@ switch1 = (6,{
 })
 
 fakeNet = [host1,host2,host3,rout1,rout2,switch1]
+"""
 
 def html_to_vagrantfile(nodes, edges):
-    VagrantFile = open("VagrantfileSWITCH", "w")
+    VagrantFile = open("Vagrantfile", "w")
 
     BeginVagrantFile(VagrantFile)
     for node in nodes:
@@ -538,7 +563,7 @@ def html_to_vagrantfile(nodes, edges):
       if node["type"] == "switch":
         writeSwitch(VagrantFile, node, edges, nodes)
       if node["type"] == "host":
-        writeDatabase(VagrantFile, node, edges, nodes)        
+        writeHost(VagrantFile, node, edges, nodes)        
     
     VagrantFile.close()
 

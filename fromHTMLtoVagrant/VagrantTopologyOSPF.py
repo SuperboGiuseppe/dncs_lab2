@@ -5,7 +5,7 @@ import yaml
 #this function writes the beginning of the VagrantFile
 def BeginVagrantFile(f):
 
-      f.write("# -*- mode: ruby -*- \n# vi: set ft=ruby :\n\n")
+    f.write("# -*- mode: ruby -*- \n# vi: set ft=ruby :\n\n")
     f.write("#All Vagrant configuration is done below. The 2 in Vagrant.configure\n#configures the configuration version we support older styles for\n#backwards compatibility. Please don't change it unless you know what\n#you're doing.\n")
     f.write("Vagrant.configure(\"2\") do |config|\n")
     f.write("config.vm.box_check_update = true\n")
@@ -26,7 +26,7 @@ def writeHost(f,Host, edges):
     Id = Host["id"]
     Name = Host["label"]
     Os  = Host["vm_image"]
-    Ram = Host"ram"]
+    Ram = Host["ram"]
     N_Cpus = Host["n_cpus"]
     Ip = Host["network_interfaces"][0]["ip_address"]
     Netmask = Host["network_interfaces"][0]["netmask"]

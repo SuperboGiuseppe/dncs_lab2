@@ -35,7 +35,7 @@ def writeHost(f, Host, edges):
     Id = Host["id"]
     Name = Host["label"]
     Os  = Host["vm_image"]
-    Ram = Host"ram"]
+    Ram = Host["ram"]
     N_Cpus = Host["n_cpus"]
     Ip = Host["network_interfaces"][0]["ip_address"]
     Netmask = Host["network_interfaces"][0]["netmask"]
