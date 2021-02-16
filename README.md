@@ -181,6 +181,10 @@ Distributed under the MIT License. See `LICENSE` for more information.
 <!-- CONTACT -->
 ## Contact
 
+Project coordinator
+- [Professor Fabrizio Granelli](https://github.com/fabrizio-granelli)
+
+Students
 - [Giuseppe Superbo](https://github.com/SuperboGiuseppe)
 - [Luca Staboli](https://github.com/LucaStabo)
 - [Muhammad Uzair](https://github.com/uzairali37)
