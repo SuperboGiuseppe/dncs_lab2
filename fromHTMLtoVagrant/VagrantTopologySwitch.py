@@ -313,7 +313,7 @@ def writeSwitch(f, Switch, edges, network):
     Ram = Switch["ram"]
     N_Cpus = Switch["n_cpus"]
     Os  = Switch["vm_image"]
-    CustumScript = Switch["custom_script"]
+    CustomScript = Switch["custom_script"]
 
     IpA = Switch["network_interfaces"][0]["ip_address"]
     NetmaskA = Switch["network_interfaces"][0]["netmask"]
@@ -436,7 +436,7 @@ def writeSwitch(f, Switch, edges, network):
         f.write(' -u ' + str(UplinkBandwidthSW))
       f.write('\n')
 
-    f.write(CustumScript + " \n") #here there is the custum script
+    f.write(CustomScript + " \n") #here there is the custum script
     f.write("echo \"Configuration END\"\n")
     f.write("echo \""+ Name + " is ready to Use\"\n")
     f.write("SHELL\n")

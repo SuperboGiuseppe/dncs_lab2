@@ -1,0 +1,106 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.css" type="text/css" />
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis-network.min.js"> </script>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+
+<style type="text/css">
+
+        #mynetwork {
+            width: 1023px;
+            height: 600px;
+            background-color: #ffffff;
+            border: 0px solid lightgray;
+            position: center;
+            float: left;
+        }
+
+        body {
+            overflow:hidden;
+        }
+
+        
+
+        
+</style>
+
+</head>
+
+<body>
+<div id = "mynetwork"></div>
+
+
+<script type="text/javascript">
+
+    // initialize global variables.
+    var edges;
+    var nodes;
+    var network; 
+    var container;
+    var options, data;
+
+    // This method is responsible for drawing the graph, returns the drawn network
+    function drawGraph() {
+        var container = document.getElementById('mynetwork');
+        
+        
+
+        // parsing and collecting nodes and edges from the python
+        nodes = new vis.DataSet([{"id": 1, "image": "../../Images/webserver.png", "label": "server1", "shape": "image", "type": "Web", "network_interfaces":[{"ip_address":"172.16.3.5/28", "netmask":"255.255.255.240", "name_interface":"eth1", "edge": [1, 3]},  {"ip_address":"172.16.4.9/30", "netmask":"255.255.255.252", "name_interface":"eth2", "edge": [1, 2]}], "vm_image":"bento/ubuntu-16.04", "ram":"1024", "n_cpus":2,"custom_script": ""},{"id": 2, "image": "../../Images/webserver.png", "label": "server2", "shape": "image", "type": "Web", "network_interfaces":[{"ip_address":"172.16.2.10/24", "netmask":"255.255.255.0", "name_interface":"eth1", "edge": [2, 6]}, {"ip_address":"172.16.4.10/30", "netmask":"255.255.255.252", "name_interface":"eth2", "edge": [1, 2]}], "vm_image":"bento/ubuntu-16.04", "ram":"1024", "n_cpus":"2", "custom_script": ""},{"id": 3, "image": "../../Images/switch.png", "label": "switch", "shape": "image", "type": "switch", "network_interfaces":[{"ip_address":"172.16.8.10/22", "netmask":"255.255.252.0", "name_interface":"HA", "edge": [3, 4]}, {"ip_address":"172.16.12.10/22", "netmask":"255.255.252.0", "name_interface":"HB", "edge": [3, 5]}, {"ip_address":"172.16.3.2/28", "netmask":"255.255.255.240", "name_interface":"SW1", "edge": [1, 3]}], "vm_image":"bento/ubuntu-16.04", "ram":"1024", "n_cpus":2, "custom_script": ""},{"id": 4, "image": "../../Images/host.png", "label": "hosta", "shape": "image", "type": "host", "network_interfaces":[{"ip_address":"172.16.8.5/22", "netmask":"255.255.252.0", "name_interface":"eth1", "edge": [3, 4]}], "vm_image":"bento/ubuntu-16.04", "ram":"1024", "n_cpus": 2, "custom_script": ""},{"id": 5, "image": "../../Images/host.png", "label": "hostb", "shape": "image", "type": "host", "network_interfaces":[{"ip_address":"172.16.12.5/22", "netmask":"255.255.252.0", "name_interface":"eth1", "edge": [3, 5]}], "vm_image":"bento/ubuntu-16.04", "ram":"1024", "n_cpus":2, "custom_script": ""},{"id": 6, "image": "../../Images/webserver.png", "label": "server3", "shape": "image", "type": "Web", "network_interfaces":[{"ip_address":"172.16.2.5/24", "netmask":"255.255.255.0", "name_interface":"eth1", "edge": [2, 6]}], "vm_image":"bento/ubuntu-16.04", "ram":"1024", "n_cpus":2, "custom_script": ""}]);
+        edges = new vis.DataSet([{"from": 1, "to": 2, "bandwidth_up": 0, "bandwidth_down": 0}, {"from": 1, "to": 3, "bandwidth_up": 0, "bandwidth_down": 0}, {"from": 3, "to": 4, "bandwidth_up": 0, "bandwidth_down": 0}, {"from": 3, "to": 5, "bandwidth_up": 0, "bandwidth_down": 0}, {"from": 2, "to": 6, "bandwidth_up": 0, "bandwidth_down": 0}]);
+
+        // adding nodes and edges to the graph
+        data = {nodes: nodes, edges: edges};
+
+        var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": false,
+            "type": "continuous"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+        
+        
+
+        
+
+        network = new vis.Network(container, data, options);
+
+        
+
+
+        
+
+        return network;
+
+    }
+
+    drawGraph();
+
+</script>
+</body>
+</html>

@@ -32,8 +32,6 @@ def converter_selector(network_path, template):
     nodes, edges = extract_network(network_path)
     if(template == "OSPF"):
         VagrantTopologyOSPF.html_to_vagrantfile(nodes, edges)
-    if(template == "Docker"):
-        VagrantTopologyDocker.html_to_vagrantfile(nodes, edges)
     if(template == "MySQL"):
         VagrantTopologyMySQL.html_to_vagrantfile(nodes, edges)
     if(template == "Switch"):

@@ -52,11 +52,11 @@ def writeHost(f,Host, edges):
     f.write(Name + ".vm.box = \"" + Os + "\"\n")
     f.write(Name + ".vm.hostname = \"" + Name + "\"\n")
 
-    if Id is 4:
+    if Id == 4:
         f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub +"\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_router-south-1\", auto_config: true\n")
-    if Id is 5:
+    if Id == 5:
         f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub +"\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_router-south-2\", auto_config: true\n")
-    if Id is 6:
+    if Id == 6:
         f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub +"\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_router-south-3\", auto_config: true\n")
     
     f.write(Name + ".vm.provision \"shell\", run: \"always\", inline: <<-SHELL\n")
@@ -156,15 +156,15 @@ def writeRouter(f,Router, edges):
     f.write(Name + ".vm.box = \"" + Os + "\"\n")
     f.write(Name + ".vm.hostname = \""+ Name +"\"\n")
 
-    if Id is 1:
+    if Id == 1:
         f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_router-south-1\", auto_config: false\n")
         f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_router-inter-1\", auto_config: false\n")
         f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_router-inter-3\", auto_config: false\n")
-    if Id is 2:
+    if Id == 2:
         f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_router-south-2\", auto_config: false\n")
         f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_router-inter-2\", auto_config: false\n")
         f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_router-inter-1\", auto_config: false\n")
-    if Id is 3:
+    if Id == 3:
         f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_router-south-3\", auto_config: false\n")
         f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_router-inter-3\", auto_config: false\n")
         f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_router-inter-2\", auto_config: false\n")  
@@ -231,7 +231,7 @@ def writeRouter(f,Router, edges):
       if UplinkBandwidth3 > 0:
         f.write(' -u ' + str(UplinkBandwidth3))
       f.write('\n')
-    f.write(CustumScript + " \n") #here there is the custum script
+    f.write(CustomScript + " \n") #here there is the custum script
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
     f.write("SHELL\n")
@@ -397,8 +397,8 @@ def remap(newList):
     return MyNet
 """
 
-def html_to_vagrantfile(listOfDevice):
-    VagrantFile = open("VagrantfileOSPF", "w")
+def html_to_vagrantfile(nodes, edges):
+    VagrantFile = open("Vagrantfile", "w")
 
     BeginVagrantFile(VagrantFile)
     for node in nodes:
@@ -407,6 +407,7 @@ def html_to_vagrantfile(listOfDevice):
       if node["type"] == "host":
         writeHost(VagrantFile, node, edges)        
 
+    VagrantFile.write("end\n")
     VagrantFile.close()
 
     #read the data structure from input
