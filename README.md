@@ -142,9 +142,9 @@ Some prerequisites have to be done before using this environment. It's based on 
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-This project is only used to provide the user to test their environments by providing the same operating system, packages, users, and configurations, all while giving users the flexibility to use their favorite editor, IDE, and browsers.
+This project is only used to provide the user to test their environments by providing the same operating system, packages, and configurations, all while giving users the flexibility to use their favorite editor, IDE, and browsers.
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+_For more examples, please refer to the [Documentation](https://www.vagrantup.com/docs)_
 
 
 
