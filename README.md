@@ -107,14 +107,15 @@ A network is composed of a set of computing devices connected to each other. Lik
 * [Docker](https://www.docker.com/)
 * [OpenSwitch](https://www.openswitch.net/)
 * [Quagga Routing](https://www.quagga.net/)
-* [Ansible](https://www.ansible.com/)
 * [Wondershaper](https://github.com/magnific0/wondershaper)
 * [Grafana](https://grafana.com/)
 * [Influxdata](https://www.influxdata.com/products/influxdb-overview/)
 * [Telegraf](https://www.influxdata.com/time-series-platform/telegraf/)
 
-
-
+These tools have not been used in the default topologies that we have created. But users can create and configure custom topologies using these tools easily.
+* [Ansible](https://www.ansible.com/)
+* [Puppet](https://puppet.com/)
+* [Salt](https://saltproject.io/automating-network-operations-with-salt-2019-2-0/)
 
 <!-- GETTING STARTED -->
 ## Getting Started
