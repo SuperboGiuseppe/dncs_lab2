@@ -80,6 +80,7 @@
 ## About The Project
 
 ![Main window screenshot][product-screenshot]
+<!-- ![Main window screenshot][product-screenshot] -- here we can add the Dashboard screenshort>
 
 This project is based on a graphical user interface (GUI) that provides a platform for the developer to create a fully automated virtual network environment for testing and development. The users can easily customize and design a virtual network environment according to their needs. With the help of this platform, a user can create and configure different virtual machines acting as a server, router, switches, and hosts or specialized hosts. Custom topologies can be designed from scratch or starting from predefined templates. Once the network is deployed and configured, the user can access or monitor each virtual machine.
 
@@ -95,7 +96,7 @@ Available features:
 
 ### Built With
 
-A network is composed of a set of computing devices connected to each other. Likewise, a graph is a mathematical structure composed of a set of nodes connected among each other via edges. For this reason, the network management core of this project is based on a really light python library called pyvis, which is based on javascript. this library, makes it possible to have a very clear network visualization and all the details of each node collected in the entity itself. On the backend, we have used the vagrant development environment by HashiCorp along with the VirtualBox. Vagrant is a simple and powerful tool that provides a platform where we can easily integrate our existing configuration management toolings like Ansible, Chef, Docker, Puppet, or Salt. 
+A network is composed of a set of computing devices connected to each other. Likewise, a graph is a mathematical structure composed of a set of nodes connected among each other via edges. For this reason, the network management core of this project is based on a really light python library called pyvis, which is based on javascript. This library, makes it possible to have a very clear network visualization and all the details of each node collected in the entity itself. In order to monitor the network statistics, we have used (Telegraf, InfluxBD, and Grafana). These technologies are open source and easy to use and implement. They also provide an open platform for beautiful analytics and monitoring (a dashboard for displaying data) from many sources, particularly time-series data. On the backend, we have used the vagrant development environment by HashiCorp along with the VirtualBox. Vagrant is a simple and powerful tool that provides a platform where we can easily integrate our existing configuration management toolings like Ansible, Chef, Docker, Puppet, or Salt. 
 
 * [Pyvis](https://pyvis.readthedocs.io/en/latest/tutorial.html)
 * [Vagrant](https://www.vagrantup.com/)
@@ -109,6 +110,10 @@ A network is composed of a set of computing devices connected to each other. Lik
 * [Quagga Routing](https://www.quagga.net/)
 * [Ansible](https://www.ansible.com/)
 * [Wondershaper](https://github.com/magnific0/wondershaper)
+* [Grafana](https://grafana.com/)
+* [Influxdata](https://www.influxdata.com/products/influxdb-overview/)
+* [Telegraf](https://www.influxdata.com/time-series-platform/telegraf/)
+
 
 
 
