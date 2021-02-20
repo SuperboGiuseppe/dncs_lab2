@@ -86,6 +86,7 @@ This project is based on a graphical user interface (GUI) that provides a platfo
 ### List of features
 Available features:
 - Provide Graphical User Interface for creating Virtual environments.
+- provide a modern monitoring architecture to monitor running virtual environments.
 - Provide the functionality to use different Linux machine's flavors for different purposes.
 - Provide the option to control your network in real-time.
 - Provide the option to write and debug the vagrant scripts.
