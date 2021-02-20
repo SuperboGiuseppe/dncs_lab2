@@ -80,7 +80,6 @@
 ## About The Project
 
 ![Main window screenshot][product-screenshot]
-<!-- ![Main window screenshot][product-screenshot] -- here we can add the Dashboard screenshort>
 
 This project is based on a graphical user interface (GUI) that provides a platform for the developer to create a fully automated virtual network environment for testing and development. The users can easily customize and design a virtual network environment according to their needs. With the help of this platform, a user can create and configure different virtual machines acting as a server, router, switches, and hosts or specialized hosts. Custom topologies can be designed from scratch or starting from predefined templates. Once the network is deployed and configured, the user can access or monitor each virtual machine.
 
