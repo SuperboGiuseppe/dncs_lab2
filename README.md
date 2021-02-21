@@ -83,9 +83,14 @@
 
 This project is based on a graphical user interface (GUI) that provides a platform for the developer to create a fully automated virtual network environment for testing and development. The users can easily customize and design a virtual network environment according to their needs. With the help of this platform, a user can create and configure different virtual machines acting as a server, router, switches, and hosts or specialized hosts. Custom topologies can be designed from scratch or starting from predefined templates. Once the network is deployed and configured, the user can access or monitor each virtual machine.
 
+### Dashboard
+
+dashboard image........... 
+
 ### List of features
 Available features:
 - Provide Graphical User Interface for creating Virtual environments.
+- provide a modern monitoring architecture to monitor running virtual environments.
 - Provide the functionality to use different Linux machine's flavors for different purposes.
 - Provide the option to control your network in real-time.
 - Provide the option to write and debug the vagrant scripts.
@@ -94,7 +99,7 @@ Available features:
 
 ### Built With
 
-A network is composed of a set of computing devices connected to each other. Likewise, a graph is a mathematical structure composed of a set of nodes connected among each other via edges. For this reason, the network management core of this project is based on a really light python library called pyvis, which is based on javascript. this library, makes it possible to have a very clear network visualization and all the details of each node collected in the entity itself. On the backend, we have used the vagrant development environment by HashiCorp along with the VirtualBox. Vagrant is a simple and powerful tool that provides a platform where we can easily integrate our existing configuration management toolings like Ansible, Chef, Docker, Puppet, or Salt. 
+A network is composed of a set of computing devices connected to each other. Likewise, a graph is a mathematical structure composed of a set of nodes connected among each other via edges. For this reason, the network management core of this project is based on a really light python library called pyvis, which is based on javascript. This library, makes it possible to have a very clear network visualization and all the details of each node collected in the entity itself. In order to monitor the network statistics, we have used (Telegraf, InfluxBD, and Grafana). These technologies are open source and easy to use and implement. They also provide an open platform for beautiful analytics and monitoring (a dashboard for displaying data) from many sources, particularly time-series data. On the backend, we have used the vagrant development environment by HashiCorp along with the VirtualBox. Vagrant is a simple and powerful tool that provides a platform where we can easily integrate our existing configuration management toolings like Ansible, Chef, Docker, Puppet, or Salt. 
 
 * [Pyvis](https://pyvis.readthedocs.io/en/latest/tutorial.html)
 * [Vagrant](https://www.vagrantup.com/)
@@ -106,10 +111,15 @@ A network is composed of a set of computing devices connected to each other. Lik
 * [Docker](https://www.docker.com/)
 * [OpenSwitch](https://www.openswitch.net/)
 * [Quagga Routing](https://www.quagga.net/)
-* [Ansible](https://www.ansible.com/)
 * [Wondershaper](https://github.com/magnific0/wondershaper)
+* [Grafana](https://grafana.com/)
+* [Influxdata](https://www.influxdata.com/products/influxdb-overview/)
+* [Telegraf](https://www.influxdata.com/time-series-platform/telegraf/)
 
-
+These tools have not been used in the default topologies that we have created. But users can create and configure custom topologies using these tools easily.
+* [Ansible](https://www.ansible.com/)
+* [Puppet](https://puppet.com/)
+* [Salt](https://saltproject.io/automating-network-operations-with-salt-2019-2-0/)
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -142,9 +152,9 @@ Some prerequisites have to be done before using this environment. It's based on 
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-This project is only used to provide the user to test their environments by providing the same operating system, packages, users, and configurations, all while giving users the flexibility to use their favorite editor, IDE, and browsers.
+This project is only used to provide the user to test their environments by providing the same operating system, packages, and configurations, all while giving users the flexibility to use their favorite editor, IDE, and browsers.
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+_For more examples, please refer to the [Documentation](https://www.vagrantup.com/docs)_
 
 
 
@@ -164,9 +174,9 @@ The road map we have:
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
 1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
+2. Create your Feature Branch (`git checkout -b`)
+3. Commit your Changes (`git commit -m 'Add some Feature'`)
+4. Push to the Branch (`git push origin Feature`)
 5. Open a Pull Request
 
 
