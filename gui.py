@@ -73,6 +73,7 @@ class network_design_window(QtWidgets.QMainWindow):
         self.ssh_window = ssh_connection(self)
         self.edge_window = edge_editors(self)
         self.vagrant_process = QtCore.QProcess(self)
+        self.dashboard_process = QtCore.QProcess(self)
         self.vagrant_process.readyReadStandardOutput.connect(self.onReadyReadStandardOutput)
         self.vagrant_process.readyReadStandardError.connect(self.onReadyReadStandardError)
 
@@ -289,13 +290,16 @@ class network_design_window(QtWidgets.QMainWindow):
 
     def vagrant_execution(self):
         os.chdir("./NetworkGraphs")
+        os.chdir("./Dashboard_Server")
+        self.dashboard_process.start('vagrant up')
+        os.chdir("..")
         os.mkdir(self.current_network_name)
         os.chdir("./" + self.current_network_name)
         print("./" + self.current_network_name)
         print(self.current_network_template)
         vagrantConverterCollector.converter_selector(self.current_network_path, self.current_network_template)
         self.debug_console_textedit.clear()
-        self.vagrant_process.start('vagrant status')
+        self.vagrant_process.start('vagrant up')
         self.button_vagrant.setDisabled(True)
         self.button_dashboard.setEnabled(True)
         self.button_destroy.setEnabled(True)

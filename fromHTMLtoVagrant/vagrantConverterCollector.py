@@ -1,4 +1,4 @@
-import VagrantTopologyOSPF, VagrantTopologyDocker, VagrantTopologyMySQL, VagrantTopologySwitch, VagrantTopologyWebServer, VagrantTopology3S2H
+import VagrantTopologyOSPF, VagrantTopologyMySQL, VagrantTopologySwitch, VagrantTopologyWebServer, VagrantTopology3S2H
 import codecs
 import yaml
 
@@ -25,10 +25,6 @@ def extract_network(network_path):
         print(edges)
 
     return nodes, edges
-
-
-def dashboard_server():
-    
 
 def converter_selector(network_path, template):
     nodes, edges = extract_network(network_path)
