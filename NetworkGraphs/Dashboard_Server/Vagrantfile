@@ -6,7 +6,8 @@ Vagrant.configure("2") do |config|
   # https://docs.vagrantup.com.
   config.vm.define "grafana_server" do |grafana_server|  # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  grafana_server.vm.box = "bento/ubuntu-16.04"
+  grafana_server.vm.box = "superbogiuseppe/grafana_server"
+  grafana_server.vm.box_version = "2"
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
   #config.vm.box_url = "http://files.vagrantup.com/precise64.box"
@@ -47,7 +48,7 @@ Vagrant.configure("2") do |config|
     # Customize the amount of memory on the VM:
     vb.memory = "2048"
     vb.cpus = 1
-    vb.name = "grafana"
+    vb.name = "grafana_server"
   end
   #
   # View the documentation for the provider you are using for more
