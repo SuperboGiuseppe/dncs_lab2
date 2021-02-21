@@ -116,6 +116,7 @@ def writeHost(f, Host, edges, network):
     if Id == 6:
       f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub + "\", netmask: \"" + Netmask + "\", virtualbox__intnet: \"broadcast_router-south-2\", auto_config: true\n") 
     
+    f.write(Name + '.vm.provision "file", source: \"../Dashboard_Server/telegraf.conf\", destination: \"/tmp/telegraf.conf\"\n')
     f.write(Name + ".vm.provision \"shell\", run: \"always\", inline: <<-SHELL\n")
     f.write("echo \"Static Routig configuration Started for " + Name + "\"\n")
     f.write("sudo sysctl -w net.ipv4.ip_forward=1\n")
@@ -142,6 +143,11 @@ def writeHost(f, Host, edges, network):
       if UplinkBandwidth > 0:
         f.write(' -u ' + str(UplinkBandwidth))
       f.write('\n')
+    f.write('wget https://dl.influxdata.com/telegraf/releases/telegraf_1.17.3-1_amd64.deb\n')
+    f.write('sudo dpkg -i telegraf_1.17.3-1_amd64.deb\n')
+    f.write('sudo mv /tmp/telegraf.conf /etc/telegraf/telegraf.conf\n')
+    f.write('sudo systemctl restart telegraf\n')
+    f.write('sudo systemctl enable telegraf\n')
     f.write(CustumScript + " \n")  #here there is the custum script
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
@@ -265,6 +271,7 @@ def writeRouter(f, Router, edges, network):
 
     f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub1 + "\", netmask: \"" + Netmask1 + "\", virtualbox__intnet: \"broadcast_router-south-" + tag + "\", auto_config: true\n")
     f.write(Name + ".vm.network \"private_network\", ip: \"" + IpNoSub2 + "\", netmask: \"" + Netmask2 + "\", virtualbox__intnet: \"broadcast_router-inter\", auto_config: true\n")
+    f.write(Name + '.vm.provision "file", source: \"../Dashboard_Server/telegraf.conf\", destination: \"/tmp/telegraf.conf\"\n')
     f.write(Name + ".vm.provision \"shell\", run: \"always\", inline: <<-SHELL\n")
     f.write("echo \"Static Routig configuration Started\"\n")
     f.write("sudo sysctl -w net.ipv4.ip_forward=1\n")
@@ -296,6 +303,11 @@ def writeRouter(f, Router, edges, network):
       if UplinkBandwidth2 > 0:
         f.write(' -u ' + str(UplinkBandwidth2))
       f.write('\n')
+    f.write('wget https://dl.influxdata.com/telegraf/releases/telegraf_1.17.3-1_amd64.deb\n')
+    f.write('sudo dpkg -i telegraf_1.17.3-1_amd64.deb\n')
+    f.write('sudo mv /tmp/telegraf.conf /etc/telegraf/telegraf.conf\n')
+    f.write('sudo systemctl restart telegraf\n')
+    f.write('sudo systemctl enable telegraf\n')
     f.write(CustomScript + " \n") #here there is the custum script
     f.write("echo \"Configuration END\"\n")
     f.write("echo \"" + Name + " is ready to Use\"\n")
@@ -380,6 +392,7 @@ def writeSwitch(f, Switch, edges, network):
     f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_router-south-1\", auto_config: false\n")
     f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_host_" + network[0]["label"] + "\", auto_config: false\n")
     f.write(Name + ".vm.network \"private_network\", virtualbox__intnet: \"broadcast_host_" + network[1]["label"] + "\", auto_config: false\n")
+    f.write(Name + '.vm.provision "file", source: \"../Dashboard_Server/telegraf.conf\", destination: \"/tmp/telegraf.conf\"\n')
     f.write(Name + ".vm.provision \"shell\", inline: <<-SHELL\n")
     f.write("echo \"OpenVSwitch Installation is started\"\n")
     f.write("apt-get update\n")
@@ -435,7 +448,11 @@ def writeSwitch(f, Switch, edges, network):
       if UplinkBandwidth3 > 0:
         f.write(' -u ' + str(UplinkBandwidthSW))
       f.write('\n')
-
+    f.write('wget https://dl.influxdata.com/telegraf/releases/telegraf_1.17.3-1_amd64.deb\n')
+    f.write('sudo dpkg -i telegraf_1.17.3-1_amd64.deb\n')
+    f.write('sudo mv /tmp/telegraf.conf /etc/telegraf/telegraf.conf\n')
+    f.write('sudo systemctl restart telegraf\n')
+    f.write('sudo systemctl enable telegraf\n')
     f.write(CustomScript + " \n") #here there is the custum script
     f.write("echo \"Configuration END\"\n")
     f.write("echo \""+ Name + " is ready to Use\"\n")

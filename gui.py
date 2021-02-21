@@ -56,7 +56,7 @@ class network_design_window(QtWidgets.QMainWindow):
         self.current_network_path = ""
         self.current_network_template = ""
         self.current_network_deployed = 0
-        self.resize(1174, 768)
+        self.resize(1274, 768)
         self.center()
         self.setWindowTitle("Virtual Network automated deployment via Vagrant")
         self.main_toolbar()
@@ -70,6 +70,7 @@ class network_design_window(QtWidgets.QMainWindow):
         self.network_wizard = new_network_wizard(self)
         self.editor_window = editor_components(self)
         self.dashboard_window = dashboard_vms(self)
+        self.ssh_window = ssh_connection(self)
         self.edge_window = edge_editors(self)
         self.vagrant_process = QtCore.QProcess(self)
         self.vagrant_process.readyReadStandardOutput.connect(self.onReadyReadStandardOutput)
@@ -170,7 +171,13 @@ class network_design_window(QtWidgets.QMainWindow):
         self.button_dashboard.setToolTip("Open the statistics and control dashboard of the deployed network")
         self.button_dashboard.setIconText("Control dashboard")
         self.button_dashboard.triggered.connect(lambda: self.dashboard_window.show())
-        self.button_dashboard.setDisabled(True)
+        #self.button_dashboard.setDisabled(True)
+
+        self.button_ssh = QtWidgets.QAction(QtGui.QIcon("./Images/ssh.png"), "Label", self)
+        self.button_ssh.setStatusTip("Prompt for making an ssh connection to a specific node")
+        self.button_ssh.setToolTip("Prompt for making an ssh connection to a specific node")
+        self.button_ssh.setIconText("SSH Connection")
+        self.button_ssh.triggered.connect(lambda: self.ssh_window.show())
 
         self.button_terminal = QtWidgets.QAction(QtGui.QIcon("./Images/terminal.png"), "Label", self)
         self.button_terminal.setStatusTip("Open the debug console")
@@ -198,6 +205,7 @@ class network_design_window(QtWidgets.QMainWindow):
         self.main_toolbar.addSeparator()
         self.main_toolbar.addAction(self.button_vagrant)
         self.main_toolbar.addAction(self.button_dashboard)
+        self.main_toolbar.addAction(self.button_ssh)
         self.main_toolbar.addAction(self.button_terminal)
         self.main_toolbar.addAction(self.button_destroy)
 
@@ -271,7 +279,7 @@ class network_design_window(QtWidgets.QMainWindow):
         self.debug_console_textedit.setReadOnly(True)
         self.debug_console_frame.move(5,430)
         self.debug_console_frame.setMinimumHeight(220)
-        self.debug_console_frame.setMinimumWidth(1168)
+        self.debug_console_frame.setMinimumWidth(1268)
         self.debug_console_textedit.resize(self.debug_console_textedit.sizeHint().width(), self.debug_console_textedit.minimumHeight())
         self.debug_console_textedit.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.debug_console_label = QtWidgets.QLabel("Debug console")
@@ -470,6 +478,7 @@ class new_network_wizard(QtWidgets.QWizard):
             self.main_window_object.current_network_path = os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html")
             self.main_window_object.editor_window = editor_components(self.main_window_object)
             self.main_window_object.dashboard_window = dashboard_vms(self.main_window_object)
+            self.main_window_object.ssh_window = ssh_connection(self.main_window_object)
             self.main_window_object.edge_window = edge_editors(self.main_window_object)
             self.main_window_object.enable_buttons_editing()
         else:
@@ -477,21 +486,17 @@ class new_network_wizard(QtWidgets.QWizard):
             self.main_window_object.current_network_name = self.template_page.field("network_path")
 
 
-class dashboard_vms(QtWidgets.QMainWindow):
+class ssh_connection(QtWidgets.QMainWindow):
 
     def __init__(self, main_window):
-        super(dashboard_vms, self).__init__()
+        super(ssh_connection, self).__init__()
         self.main_window_object = main_window
         self.layout = QtWidgets.QVBoxLayout(self)
-        self.setWindowTitle("Control dashboard")
-        self.setWindowIcon(QtGui.QIcon("./Images/dashboard.png"))
+        self.setWindowTitle("SSH Connection to a node")
+        self.setWindowIcon(QtGui.QIcon("./Images/ssh.png"))
         self.label_combobox = QtWidgets.QLabel("Select the virtual machine:")
         self.vm_combobox = QtWidgets.QComboBox()
         self.vm_names()
-        self.graphs_frame = QtWidgets.QWidget()
-        self.graphs_frame_layout = QtWidgets.QGridLayout()
-        self.images_placeholder()
-        self.graphs_frame.setLayout(self.graphs_frame_layout)
         self.button_frame = QtWidgets.QWidget()
         self.button_layout = QtWidgets.QHBoxLayout()
         self.button_layout.setAlignment(QtCore.Qt.AlignRight)
@@ -503,11 +508,13 @@ class dashboard_vms(QtWidgets.QMainWindow):
         self.button_frame.setLayout(self.button_layout)
         self.layout.addWidget(self.label_combobox)
         self.layout.addWidget(self.vm_combobox)
-        self.layout.addWidget(self.graphs_frame)
         self.layout.addWidget(self.button_frame)
         self.window = QtWidgets.QWidget()
         self.window.setLayout(self.layout)
+        #self.window.setMinimumWidth(200)
+        #self.window.setFixedWidth(200)
         self.setCentralWidget(self.window)
+        self.setMinimumWidth(400)
 
     def ssh_connection(self):
         current_vm = self.vm_combobox.currentText()
@@ -519,24 +526,17 @@ class dashboard_vms(QtWidgets.QMainWindow):
         for node in nodes:
             self.vm_combobox.addItem(node["label"])
 
-    def images_placeholder(self):
-        self.label_matrix = []
-        self.label_list1 = []
-        self.label_list2 = []
-        self.pixmap = QtGui.QPixmap('./Images/placeholder.png')
-        self.pixmap2 = self.pixmap.scaledToHeight(300)
-        for x in range(3):
-            label = QtWidgets.QLabel()
-            label.setPixmap(self.pixmap2)
-            self.label_list1.append(label)
-            label = QtWidgets.QLabel()
-            label.setPixmap(self.pixmap2)
-            self.label_list2.append(label)
-        self.label_matrix.append(self.label_list1)
-        self.label_matrix.append(self.label_list2)
-        for x in range(2):
-            for y in range(3):
-                self.graphs_frame_layout.addWidget(self.label_matrix[x][y], x, y)
+
+class dashboard_vms(QtWidgets.QMainWindow):
+
+    def __init__(self, main_window):
+        super(dashboard_vms, self).__init__()
+        self.resize(1274, 768)
+        self.setWindowIcon(QtGui.QIcon("./Images/dashboard.png"))
+        self.setWindowTitle("Dashboard statics monitoring")
+        self.browser = QtWebEngineWidgets.QWebEngineView()
+        self.browser.setUrl(QtCore.QUrl("http://127.0.0.1:3000/d/sF7d-FHZz/dashboard-network-nodes-monitoring?orgId=1&refresh=1m"))
+        self.setCentralWidget(self.browser)
 
 
 class editor_components(QtWidgets.QMainWindow):
