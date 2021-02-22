@@ -95,16 +95,17 @@ A monitoring dashboard is configured and deployed in order to provide users an e
 ![Dashboard example CPU][dashboard-cpu]
 ![Dashboard example network][dashboard-network]
 
-
+The configuration of this flux is automated as, everytime a network is deployed, an additional vagrant environment is deployed in "Dashboard_server". The machine where grafana server is executed is based on the following Vagrant Box: [superbogiuseppe/grafana_server](https://app.vagrantup.com/superbogiuseppe/boxes/grafana_server).
 
 ### List of features
 Available features:
-- Provide Graphical User Interface for creating Virtual environments.
-- provide a modern monitoring architecture to monitor running virtual environments.
-- Provide the functionality to use different Linux machine's flavors for different purposes.
-- Provide the option to control your network in real-time.
-- Provide the option to write and debug the vagrant scripts.
-- Provide the option of customizing the network topologies.
+- Provide Graphical User Interface for creating Virtual environments;
+- provide a modern monitoring architecture to monitor running virtual environments;
+- Provide the functionality to use different Linux machine's flavors for different purposes;
+- Provide the option to set a specific uplink or downlink speed limit;
+- Provide the option to control your network in real-time;
+- Provide the option to write and debug the vagrant scripts;
+- Provide the option of customizing the network topologies;
 - Provide the option of using different Docker images.
 
 ### Built With
@@ -150,6 +151,10 @@ Some prerequisites have to be done before using this environment. It's based on 
 ### Installation Requirements
 
 1. [Python 3.9.0](https://www.python.org/)
+    - [pyvis](https://pyvis.readthedocs.io/en/latest/install.html#install-with-pip) (pip install pyvis)
+    - [PyQt5](https://pypi.org/project/PyQt5/) (pip install pyqt5)
+    - [PyYAML](https://pypi.org/project/PyYAML/) (pip install pyyaml)
+    - [ipcalc](https://pypi.org/project/ipcalc/) (pip install ipcalc)
 2. 10GB disk storage
 3. Windows/Linux/Mac
 4. [VirtualBox](https://www.virtualbox.org/)
@@ -162,9 +167,52 @@ Some prerequisites have to be done before using this environment. It's based on 
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-This project is only used to provide the user to test their environments by providing the same operating system, packages, and configurations, all while giving users the flexibility to use their favorite editor, IDE, and browsers.
+This project is only used to provide the user to test their environments by providing the same operating system, packages, and configurations, all while giving users the flexibility to use their favorite editor, IDE, and browsers. In order to launch the design tool, execute the following command in the main directory of the project:
+   ```sh
+   python ./main.py
+   ```
 
-_For more examples, please refer to the [Documentation](https://www.vagrantup.com/docs)_
+### Create a new network
+By pressing "New network", a wizard will be prompted. Here it is possible to create a network from scratch (**Not currently implemented**) or to create a network from a template. Once the template has been selected, the same topology will be available on the main canvas and ready to be configured/modified/deployed.
+
+### Save network
+By pressing "Save network", it is possible to save the network in a html format (Pyvis compatible format) along with its configuration.
+
+### Open network
+By pressing "Open network", it is possible to import an already configured/designed network. It is necessary that the file is compatible with the pyvis library (HTML format).
+
+### Adding new devices (**Not currently implemented**)
+By pressing the buttons "Router", "Switch", "Host" or "Other", it is possible to add a new device to the network.
+
+### Edit configuration
+By pressing "Edit configuration" it is possible to edit the configuration of each device of the network:
+  - Virtual machine characteristics (CPUs, RAM, VM Image, device name);
+  - Network configuration of each interface (IP, Netmask, interface name);
+  - Custom script to be provisioned during the deployment.
+
+### Edge configuration
+By pressing "Edge configuration", it is possible to edit uplink and downlink speed limits of each edge.
+
+### Deploy network
+By pressing "Deploy network", the network will be deployed via Vagrant. It is recommended to have the debug console active in order to retrieve any deployment error or warning.
+
+### Control dashboard
+Once the network is deployed successfully, by pressing "Control dashboard", it is possible to navigate in the grafana interface in order to visualize any real-time statistic of each machine.
+
+### SSH Connection
+By pressing "SSH Connection", it is possible to establish an SSH connection with a specific node of the deployed network: a terminal will be prompted once the connection has been established.
+
+### Debug console
+By pressing "Debug console", it is possible to show/hide the debug console which is useful during the deployment phase of the network.
+
+### Turn on/off VMs
+By pressing "Turn on/of VMs", it is possible to stop all the devices of the network without destroying them.
+
+### Destroy network
+By pressing "Destroy network", it is possible to destroy the deployed network along with the dashboard server.
+
+
+<!-- _For more examples, please refer to the [Documentation](https://www.vagrantup.com/docs)_ >
 
 
 
@@ -174,8 +222,6 @@ The road map we have:
 - On the Frontend python library called pyvis used.
 - On the backend vagrant scripts used to create the virtual machines.
 - On the backend, we have created a mechanism that converts the Vagrant scripts into the HTML formats in order to be compatible with the pyvis.
-
-
 
 
 <!-- CONTRIBUTING -->
@@ -188,7 +234,6 @@ Contributions are what make the open source community such an amazing place to b
 3. Commit your Changes (`git commit -m 'Add some Feature'`)
 4. Push to the Branch (`git push origin Feature`)
 5. Open a Pull Request
-
 
 
 <!-- LICENSE -->

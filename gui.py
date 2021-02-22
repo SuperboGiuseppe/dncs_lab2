@@ -10,8 +10,8 @@
 import sys, os
 from PyQt5 import QtGui, QtWidgets, QtCore, uic, QtWebEngineWidgets
 from pyvis.network import Network
-import matplotlib.image as mpimg
-import numpy
+#import matplotlib.image as mpimg
+#import numpy
 import network_core
 
 """
