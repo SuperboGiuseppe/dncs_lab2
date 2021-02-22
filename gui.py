@@ -56,7 +56,8 @@ class network_design_window(QtWidgets.QMainWindow):
         self.current_network_path = ""
         self.current_network_template = ""
         self.current_network_deployed = 0
-        self.resize(1274, 768)
+        self.vm_power = 0
+        self.resize(1325, 768)
         self.center()
         self.setWindowTitle("Virtual Network automated deployment via Vagrant")
         self.main_toolbar()
@@ -172,20 +173,28 @@ class network_design_window(QtWidgets.QMainWindow):
         self.button_dashboard.setToolTip("Open the statistics and control dashboard of the deployed network")
         self.button_dashboard.setIconText("Control dashboard")
         self.button_dashboard.triggered.connect(lambda: self.dashboard_window.show())
-        #self.button_dashboard.setDisabled(True)
+        self.button_dashboard.setDisabled(True)
 
         self.button_ssh = QtWidgets.QAction(QtGui.QIcon("./Images/ssh.png"), "Label", self)
         self.button_ssh.setStatusTip("Prompt for making an ssh connection to a specific node")
         self.button_ssh.setToolTip("Prompt for making an ssh connection to a specific node")
         self.button_ssh.setIconText("SSH Connection")
         self.button_ssh.triggered.connect(lambda: self.ssh_window.show())
+        self.button_ssh.setDisabled(True)
 
         self.button_terminal = QtWidgets.QAction(QtGui.QIcon("./Images/terminal.png"), "Label", self)
         self.button_terminal.setStatusTip("Open the debug console")
         self.button_terminal.setToolTip("Open the debug console")
         self.button_terminal.setIconText("Debug console")
         self.button_terminal.triggered.connect(lambda: self.debug_console_frame.setVisible(False) if self.debug_console_frame.isVisible() else self.debug_console_frame.setVisible(True))
-           
+
+        self.button_power = QtWidgets.QAction(QtGui.QIcon("./Images/switchoff_on.png"), "Label", self)
+        self.button_power.setStatusTip("Turn on/off any device of the network")
+        self.button_power.setToolTip("Turn on/off any device of the network")
+        self.button_power.setIconText("Turn on/off VMs")
+        self.button_power.triggered.connect(lambda: self.vagrant_halt())
+        self.button_power.setDisabled(True)
+          
         self.button_destroy = QtWidgets.QAction(QtGui.QIcon("./Images/bin.png"), "Label", self)
         self.button_destroy.setStatusTip("Destroy the current deployed virtual machines")
         self.button_destroy.setToolTip("Destroy the current deployed virtual machines")
@@ -208,6 +217,7 @@ class network_design_window(QtWidgets.QMainWindow):
         self.main_toolbar.addAction(self.button_dashboard)
         self.main_toolbar.addAction(self.button_ssh)
         self.main_toolbar.addAction(self.button_terminal)
+        self.main_toolbar.addAction(self.button_power)
         self.main_toolbar.addAction(self.button_destroy)
 
 
@@ -280,7 +290,7 @@ class network_design_window(QtWidgets.QMainWindow):
         self.debug_console_textedit.setReadOnly(True)
         self.debug_console_frame.move(5,430)
         self.debug_console_frame.setMinimumHeight(220)
-        self.debug_console_frame.setMinimumWidth(1268)
+        self.debug_console_frame.setMinimumWidth(1320)
         self.debug_console_textedit.resize(self.debug_console_textedit.sizeHint().width(), self.debug_console_textedit.minimumHeight())
         self.debug_console_textedit.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.debug_console_label = QtWidgets.QLabel("Debug console")
@@ -300,17 +310,40 @@ class network_design_window(QtWidgets.QMainWindow):
         vagrantConverterCollector.converter_selector(self.current_network_path, self.current_network_template)
         self.debug_console_textedit.clear()
         self.vagrant_process.start('vagrant up')
+        self.vm_power = 1
         self.button_vagrant.setDisabled(True)
         self.button_dashboard.setEnabled(True)
         self.button_destroy.setEnabled(True)
+        self.button_ssh.setEnabled(True)
+        self.button_power.setEnabled(True)
+
+    def vagrant_halt(self):
+        if(self.vm_power == 1):
+            self.vagrant_process.start('vagrant halt')
+            os.chdir("..")
+            os.chdir("./Dashboard_Server")
+            self.dashboard_process.start('vagrant halt')
+            self.vm_power = 0
+        else:
+            self.vagrant_process.start('vagrant up')
+            os.chdir("..")
+            os.chdir("./Dashboard_Server")
+            self.dashboard_process.start('vagrant up')
+            self.vm_power = 1 
+
 
     def vagrant_destroy(self):
         self.vagrant_process.start('vagrant destroy -f')
+        os.chdir("..")
+        os.chdir("./Dashboard_Server")
+        self.dashboard_process.start('vagrant destroy -f')
+        self.vm_power = 0
         self.button_dashboard.setDisabled(True)
         self.button_vagrant.setEnabled(True)
         self.button_destroy.setDisabled(True)
-
+        self.button_ssh.setDisabled(True)
     
+
     def onReadyReadStandardOutput(self):
         result = self.vagrant_process.readAllStandardOutput().data().decode()
         self.debug_console_textedit.appendPlainText(result)

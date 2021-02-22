@@ -85,7 +85,16 @@ This project is based on a graphical user interface (GUI) that provides a platfo
 
 ### Dashboard
 
-dashboard image........... 
+A monitoring dashboard is configured and deployed in order to provide users an extended view of the single virtual machine status. The configuration of the dashboard is based on a specific data flux which is commonly adopted in network configurations:
+- **Telegraf** collects data from the target node and sends it to a specific end-point via http requests;
+- **Influxdb** receives the data from the target node and stores it in an optimal way;
+- **Grafana** plots and prompts the data stored in influxdb through a custom dashboard.
+
+![Dashboard data flux scheme][dashboard-flux]
+![Dashboard example CPU][dashboard-cpu]
+![Dashboard example network][dashboard-network]
+
+
 
 ### List of features
 Available features:
@@ -139,7 +148,7 @@ Some prerequisites have to be done before using this environment. It's based on 
 
 ### Installation Requirements
 
-1. [Python](https://www.python.org/)
+1. [Python 3.9.0](https://www.python.org/)
 2. 10GB disk storage
 3. Windows/Linux/Mac
 4. [VirtualBox](https://www.virtualbox.org/)
@@ -231,4 +240,7 @@ Project Link: [AUTOMATING THE DEPLOYMENT OF NETWORK SETUPS USING VAGRANT](https:
 [issues-url]: https://github.com/SuperboGiuseppe/dncs_lab2/issues
 [license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
 [license-url]: https://github.com/othneildrew/Best-README-Template/blob/master/LICENSE.txt
-[product-screenshot]: Images/screenshot.png
+[product-screenshot]: Images/Documentation/screenshot.png
+[dashboard-flux]: Images/Documentation/dashboard_flux.png
+[dashboard-cpu]: Images/Documentation/Dashboard_2.png
+[dashboard-network]: Images/Documentation/Dashboard_1.png
