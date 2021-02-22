@@ -226,6 +226,7 @@ The road map we have:
 - On the Frontend python library called pyvis used.
 - On the backend vagrant scripts used to create the virtual machines.
 - On the backend, we have created a mechanism that converts the Vagrant scripts into the HTML formats in order to be compatible with the pyvis.
+- A virtual machine created separately to manage the dashboard that runs along automatically with vagrant topologies. 
 
 
 <!-- CONTRIBUTING -->
