@@ -97,6 +97,10 @@ A monitoring dashboard is configured and deployed in order to provide users an e
 
 The configuration of this flux is automated as, everytime a network is deployed, an additional vagrant environment is deployed in "Dashboard_server". The machine where grafana server is executed is based on the following Vagrant Box: [superbogiuseppe/grafana_server](https://app.vagrantup.com/superbogiuseppe/boxes/grafana_server).
 
+Credentials for the dashboard:
+    - Username: admin
+    - Password: dashboard
+
 ### List of features
 Available features:
 - Provide Graphical User Interface for creating Virtual environments;

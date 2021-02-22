@@ -311,11 +311,13 @@ class network_design_window(QtWidgets.QMainWindow):
         self.debug_console_textedit.clear()
         self.vagrant_process.start('vagrant up')
         self.vm_power = 1
+        
         self.button_vagrant.setDisabled(True)
         self.button_dashboard.setEnabled(True)
         self.button_destroy.setEnabled(True)
         self.button_ssh.setEnabled(True)
         self.button_power.setEnabled(True)
+        self.button_power.setIconText("Turn off VMs")
 
     def vagrant_halt(self):
         if(self.vm_power == 1):
@@ -324,12 +326,18 @@ class network_design_window(QtWidgets.QMainWindow):
             os.chdir("./Dashboard_Server")
             self.dashboard_process.start('vagrant halt')
             self.vm_power = 0
+            os.chdir("..")
+            os.chdir("./" + self.current_network_name)
+            self.button_power.setIconText("Turn on VMs")
         else:
             self.vagrant_process.start('vagrant up')
             os.chdir("..")
             os.chdir("./Dashboard_Server")
             self.dashboard_process.start('vagrant up')
-            self.vm_power = 1 
+            self.vm_power = 1
+            os.chdir("..")
+            os.chdir("./" + self.current_network_name)
+            self.button_power.setIconText("Turn off VMs")
 
 
     def vagrant_destroy(self):
@@ -342,6 +350,7 @@ class network_design_window(QtWidgets.QMainWindow):
         self.button_vagrant.setEnabled(True)
         self.button_destroy.setDisabled(True)
         self.button_ssh.setDisabled(True)
+        self.button_power.setDisabled(True)
     
 
     def onReadyReadStandardOutput(self):
@@ -812,6 +821,7 @@ class editor_components(QtWidgets.QMainWindow):
                 devices[index]["network_interfaces"][table.currentItem().row()]["netmask"] = table.currentItem().text()
             if (table.currentItem().column()==2):
                 devices[index]["network_interfaces"][table.currentItem().row()]["name_interface"] = table.currentItem().text()
+            
     
     def on_save(self):
         """Method called when the user presses the save button in the editor configuration. It applies the changes in the temporary network and updates the network graph of the canvas.
@@ -824,14 +834,18 @@ class editor_components(QtWidgets.QMainWindow):
         print(self.routers)
         print(self.switches)
         print(self.hosts)
+        print(self.hosts)
         network_core.dictionary_to_nodes(self.routers, G)
         network_core.dictionary_to_nodes(self.switches, G)
         network_core.dictionary_to_nodes(self.hosts, G)
+        network_core.dictionary_to_nodes(self.others, G)
         network_core.dictionary_to_edges(self.temporary_network.edges, G)
         self.main_window_object.current_network = G
         G.save_graph("./NetworkGraphs/Temp_Network/temp_network.html")
         network_core.html_fix(os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html"))
         self.main_window_object.update_canvas_html(os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html"))
+        self.main_window_object.ssh_window = ssh_connection(self.main_window_object)
+        
         self.close()
     
     def on_cancel(self):
