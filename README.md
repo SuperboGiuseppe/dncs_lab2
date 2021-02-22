@@ -57,6 +57,7 @@
       <ul>
         <li><a href="#List-of-features">List of features</a></li>
         <li><a href="#built-with">Built With</a></li>
+        <li><a href="#Dashboard">Dashboard</a></li>
       </ul>
     </li>
     <li>
