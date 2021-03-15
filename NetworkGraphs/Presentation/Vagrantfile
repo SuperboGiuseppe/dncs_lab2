@@ -1,0 +1,63 @@
+# webserver and a host you can access the webserver from your browser with ip address 10.0.0.50 or from the host 
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+Vagrant.configure("2") do |config|
+# Configure web server machine
+config.vm.define "web2" do |web2|
+web2.vm.box = "bento/ubuntu-16.04"
+web2.vm.hostname = "web2"
+web2.vm.network "private_network", ip: "10.0.0.51/24" 
+web2.vm.provision "file", source: "../Dashboard_Server/telegraf.conf", destination: "/tmp/telegraf.conf"
+web2.vm.provision "shell", inline: <<-SHELL 
+echo "Starting Provision: web server"
+sudo apt-get update
+sudo apt-get install -y nginx
+touch /var/www/html/index.php
+sudo apt-get install -y php-fpm php-mysql
+cd /home/vagrant
+git clone https://github.com/magnific0/wondershaper.git
+cd wondershaper
+sudo ./wondershaper -a eth1 -d 1000 -u 1000
+wget https://dl.influxdata.com/telegraf/releases/telegraf_1.17.3-1_amd64.deb
+sudo dpkg -i telegraf_1.17.3-1_amd64.deb
+sudo mv /tmp/telegraf.conf /etc/telegraf/telegraf.conf
+sudo systemctl restart telegraf
+sudo systemctl enable telegraf
+sudo apt install -y htop 
+echo "Provision web server complete"
+SHELL
+web2.vm.provider "virtualbox" do |vb|
+vb.memory = 1024
+vb.cpus = 2
+end
+end
+# Configure database server machine
+config.vm.define "db2" do |db2|
+db2.vm.box = "bento/ubuntu-16.04"
+db2.vm.hostname = "db2"
+db2.vm.network "private_network", ip: "10.0.0.52/24" 
+db2.vm.provision "file", source: "../Dashboard_Server/telegraf.conf", destination: "/tmp/telegraf.conf"
+db2.vm.provision "shell", run: "always", inline: <<-SHELL
+sudo apt update
+sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install mysql-server
+echo "WARNING: It is necessary to set the root password of mysql-server before using it!!!"
+echo "Example password configuration: mysqladmin -u root password mysecretpasswordgoeshere"
+sleep 10
+cd /home/vagrant
+git clone https://github.com/magnific0/wondershaper.git
+cd wondershaper
+sudo ./wondershaper -a eth1 -d 1000 -u 1000
+wget https://dl.influxdata.com/telegraf/releases/telegraf_1.17.3-1_amd64.deb
+sudo dpkg -i telegraf_1.17.3-1_amd64.deb
+sudo mv /tmp/telegraf.conf /etc/telegraf/telegraf.conf
+sudo systemctl restart telegraf
+sudo systemctl enable telegraf
+sudo apt install -y htop 
+echo "Provision database server complete"
+SHELL
+db2.vm.provider "virtualbox" do |vb|
+vb.memory = 1024
+vb.cpus = 2
+end
+end
+end

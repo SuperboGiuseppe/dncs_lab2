@@ -516,8 +516,8 @@ class new_network_wizard(QtWidgets.QWizard):
 
         """
         if self.currentId() == self.template_id:
-            template_path = self.templates_directory_path + "\\" + self.template_page.field("network_path")
-            self.main_window_object.current_network_template = template_path.split("\\")[len(template_path.split("\\"))-1].split("_")[0]
+            template_path = self.templates_directory_path + "/" + self.template_page.field("network_path")
+            self.main_window_object.current_network_template = template_path.split("/")[len(template_path.split("/"))-1].split("_")[0]
             self.main_window_object.current_network = network_core.open_network(template_path)
             self.main_window_object.current_network_name = self.template_page.field("network_name")
             self.main_window_object.update_canvas_html(os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html"))
@@ -845,6 +845,7 @@ class editor_components(QtWidgets.QMainWindow):
         network_core.html_fix(os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html"))
         self.main_window_object.update_canvas_html(os.path.abspath("./NetworkGraphs/Temp_Network/temp_network.html"))
         self.main_window_object.ssh_window = ssh_connection(self.main_window_object)
+        self.main_window_object.edge_window = edge_editors(self.main_window_object)
         
         self.close()
     
